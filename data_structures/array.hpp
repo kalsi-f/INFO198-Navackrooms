@@ -4,7 +4,7 @@
 namespace array {
 	template <typename T>
 	struct Dynamic {
-		T *data;
+		T *data = nullptr;
 		size_t size;
 		size_t capacity;
 	};
@@ -13,22 +13,26 @@ namespace array {
 	template <typename T>
 	size_t _find_pow_2(size_t size);
 	template <typename T>
-  	void _copy(Dynamic<T> *source, T *sink);
+  	void _move(Dynamic<T> *source, T *sink);
   	
 	// Funciones principales
 	template <typename T>
 	Dynamic<T> build(size_t size);
 	template <typename T>
 	inline Dynamic<T> reserve(size_t capacity);
+	/*
 	template <typename T>
 	inline T get(Dynamic<T> *array, size_t index);
 	template <typename T>
 	inline void set(Dynamic<T> *array, T value, size_t index);
+	*/
 	template <typename T>
-	void push_back(Dynamic<T> *array, T value);	
-  
+	void push_back(Dynamic<T> *array, T value);
+  	template <typename T>
+	void pop(Dynamic<T> *array, T *pointer);
+	
 	size_t _find_pow_2(size_t size) {
-		// Encuentra la potencia de 2 mas cercana a size
+		// Encuentra la potencia de 2 mayor o igual que size
 		size--;
 		size |= size >> 1;
 		size |= size >> 2;
@@ -45,15 +49,13 @@ namespace array {
 	}
 
 
-	void _copy(Dynamic<T> *source, T *sink) {
-		// Asume que el size del source es menor o igual al del sink	
-		T *pointerSource = source->data;
-		T *pointerSink = sink;
-		T *end = &(source->data[source->size]);
+	void _move(Dynamic<T> *source, T *sink) {
+		T *pSink = sink;
 		for (T *p = source->data; p < &(source->data[source->size]); p++) {
 			*pSink = *p;
 			pSink++;
 		}
+
 		delete [] source->data;
 		source->data = sink;
 	
@@ -73,7 +75,7 @@ namespace array {
 	inline Dynamic<T> reserve(size_t capacity) {
 		size_t capacity = find_pow_2(capacity);
 		return Dynamic<T> array = {
-			new T[1ULL << exponent],
+			new T[capacity],
 			0,
 			capacity,
 		}
@@ -82,14 +84,23 @@ namespace array {
 	void reserve(Dynamic<T> *array) {
 		size_t capacity = array->capacity << 1ULL;
 		T *sink = new T[capacity];
-		_copy(array, sink);
+		_move(array, sink);
 	}
 
 	template<typename T>
 	void reserve(Dynamic<T> *array, size_t capacity) {
 		size_t capacity = find_pow_2(capacity);
 		T *sink = new T[capacity];
-		_copy(array, sink);	
+		_move(array, sink);	
+	}
+	
+	void shrink(Dynamic<T> *array) {
+		// Si 1/4 de capacity es mayor al size reducimos capacity a la mitad
+		if (array->capacity >> 2ULL > array->size) {
+			size_t capacity = array->capacity >> 1ULL;
+			T *sink = new T[capacity];
+			_copy(array, sink);	
+		}
 	}
 
 	/*
@@ -107,8 +118,17 @@ namespace array {
 	template <typename T>
 	void push_back(Dynamic<T> *array, T value) {
 		// Si el arreglo esta lleno creo uno nuevo con el doble de capacidad
-		if (array->size == (array->capacity) reserve(array);
+		if (array->size == array->capacity) reserve(array);
 		array->data[size] = value;
-		size++;
+		array->size++;
+	}
+
+	template <typename T>
+	void pop(Dynamic<T> *array, T *pointer) {
+		for (T *p = pointer, p < &(array->data[array->size]) - 1; p++) {
+			*(p) = *(p+1);
+		}
+		array->size--;
+		shrink(array);
 	}
 }

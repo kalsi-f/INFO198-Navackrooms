@@ -8,14 +8,13 @@ namespace user {
 		ADMIN
 	};
 	
-	string profiles[2];
-	profiles = ["GENERAL", "ADMIN"];
+	string profiles = ["GENERAL", "ADMIN"];
 
 	struct User {
-		int id;
-		string name;
-		string username;
-		string password;
+		int64_t id;
+		char name[16];
+		char username[16];
+		char password[16];
 		Profile profile;
 	};
 	
