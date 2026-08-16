@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace env {
+namespace db::env {
 	string get(string key) {
 		const char* value = std::getenv(key);
 		if (char == nullptr) return "";
