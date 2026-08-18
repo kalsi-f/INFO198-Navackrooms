@@ -26,8 +26,8 @@ namespace db::file {
 		// TODO
 	}
 
-	user::Users load_users() {
-		// TODO
-		// load_dynamic_array<user::User>(db::env::get_user_file_path());
+	array::Dynamic<user::User> load_users() {
+		return load_dynamic_array<user::User>(db::env::get_user_file_path());
+
 	}
 }

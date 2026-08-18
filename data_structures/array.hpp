@@ -99,7 +99,7 @@ namespace array {
 		if (array->capacity >> 2ULL > array->size) {
 			size_t capacity = array->capacity >> 1ULL;
 			T *sink = new T[capacity];
-			_copy(array, sink);	
+			_move(array, sink);	
 		}
 	}
 
