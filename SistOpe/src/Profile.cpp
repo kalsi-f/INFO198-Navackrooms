@@ -10,7 +10,7 @@ vector<Profile> loadProfiles(const string& path) {
         exit(1);
     }
 
-    vector<Profile> profiles;
+    vector<Profile> profiles; // vector de structs Profile
     string line;
 
     while (getline(file, line)) {
@@ -27,14 +27,14 @@ vector<Profile> loadProfiles(const string& path) {
             p.options.push_back(stoi(option));
         }
 
-        profiles.push_back(p);
+        profiles.push_back(p); // agrego al vector de structs Profile
     }
 
     return profiles;
 }
 
 void appendProfile(const string& path, const Profile& p) {
-    ofstream file(path, ios::app); // ios app para agregar al final sin borrar lo que existe
+    ofstream file(path, ios::app); // ios app para agregar al final sin borrar lo que existe (tipos de ios::)
 
     if (!file.is_open()) {
         cerr << "Error: no se pudo abrir el archivo '" << path << "'" << endl;
@@ -51,4 +51,46 @@ void appendProfile(const string& path, const Profile& p) {
     }
 
     file << endl;
+}
+
+void saveAllProfiles(const string& path, const vector<Profile>& profiles) {
+    ofstream file(path); // lo mismo que ios::out, pero este borra todo el contenido previo
+
+    for (int i = 0; i < profiles.size(); i++) {
+        file << profiles[i].name << ";";
+        for (int j = 0; j < profiles[i].options.size(); j++) {
+            file << profiles[i].options[j];
+            if (j < profiles[i].options.size() - 1) {
+                file << ",";
+            }
+        }
+        file << endl;
+    }
+}
+
+vector<Profile>& listProfiles(vector<Profile>& profiles, bool& loaded, const string& path) {
+    if (!loaded) {
+        profiles = loadProfiles(path);
+        loaded = true;
+    }
+    return profiles;
+}
+
+void createProfile(vector<Profile>& profiles, bool& loaded, const string& path, const Profile& p) {
+    listProfiles(profiles, loaded, path); // asegura que este cargado antes de agregar
+    profiles.push_back(p);
+    appendProfile(path, p);
+}
+
+void deleteProfile(vector<Profile>& profiles, bool& loaded, const string& path, const string& name) {
+    listProfiles(profiles, loaded, path);
+
+    for (int i = 0; i < profiles.size(); i++) {
+        if (profiles[i].name == name) {
+            profiles.erase(profiles.begin() + i);
+            break;
+        }
+    }
+
+    saveAllProfiles(path, profiles);
 }

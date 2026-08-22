@@ -4,29 +4,45 @@
 #include <string>
 #include <vector>
 #include "Profile.h"
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include <cstring>  // char
+#include <fstream> // archivos
+#include <iostream> 
+#include <sstream> // stringstream
 
 using namespace std;
 
+ 
+using namespace std;
+ 
 struct User {
     int id;
     char name[50];
     char username[20];
     char password[20];
-    Profile* profile;   // puntero al Perfil
+    Profile* profile;   // puntero al Profile correspondiente
 };
-
-// persistencia 
-
-// Lee USUARIOS.TXT completo y devuelve la lista de usuarios cargados.
-// Cada usuario queda con su puntero "profile" apuntando al Perfil
-// correspondiente dentro del vector "profiles" 
+ 
+// persistencia
+// lee USUARIOS.TXT y devuelve la lista de usuarios cargados,
+// con el puntero "profile" de cada uno por nombre
 vector<User> loadUsers(const string& path, vector<Profile>& profiles);
-
-// Agrega una nueva linea al final de USUARIOS.TXT con el usuario dado.
+ 
+// agrega una nueva linea al final de USUARIOS.TXT
 void appendUser(const string& path, const User& u);
-
-#endif 
+ 
+// reescribe el archivo completo desde cero con la lista actual
+void saveAllUsers(const string& path, const vector<User>& users);
+ 
+// si "loaded" es false, carga desde archivo y lo marca como true.
+// si ya es true, devuelve directamente la lista que ya esta en memoria.
+vector<User>& listUsers(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles);
+ 
+// agrega el usuario a la lista en memoria y al archivo
+void createUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, const User& u);
+ 
+// elimina el usuario por id. si su perfil es "ADMIN", imprime una alerta
+// pero igual lo elimina (solo advierte, no bloquea)
+void deleteUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, int id);
+ 
+#endif
+ 
