@@ -3,11 +3,6 @@
  
 #include <string>
 #include <vector>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
 using namespace std;
 
 struct Profile {
@@ -33,7 +28,9 @@ vector<Profile>& listProfiles(vector<Profile>& profiles, bool& loaded, const str
 void createProfile(vector<Profile>& profiles, bool& loaded, const string& path, const Profile& p);
  
 // elimina el perfil (por nombre) de la lista en memoria y reescribe el archivo
-void deleteProfile(vector<Profile>& profiles, bool& loaded, const string& path, const string& name);
+// devuelve true si se encontro y elimino, false si no existia ese nombre.
+bool deleteProfile(vector<Profile>& profiles, bool& loaded, const string& path, const string& name);
+
 
 #endif 
 

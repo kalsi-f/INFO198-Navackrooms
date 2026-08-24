@@ -4,14 +4,6 @@
 #include <string>
 #include <vector>
 #include "Profile.h"
-#include <cstring>  // char
-#include <fstream> // archivos
-#include <iostream> 
-#include <sstream> // stringstream
-
-using namespace std;
-
- 
 using namespace std;
  
 struct User {
@@ -42,7 +34,7 @@ void createUser(vector<User>& users, bool& loaded, const string& path, vector<Pr
  
 // elimina el usuario por id. si su perfil es "ADMIN", imprime una alerta
 // pero igual lo elimina (solo advierte, no bloquea)
-void deleteUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, int id);
+bool deleteUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, int id);
  
 #endif
  

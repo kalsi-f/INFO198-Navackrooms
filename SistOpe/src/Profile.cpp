@@ -1,5 +1,9 @@
 #include "Profile.h"
 
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 using namespace std;
 
 vector<Profile> loadProfiles(const string& path) {
@@ -82,15 +86,16 @@ void createProfile(vector<Profile>& profiles, bool& loaded, const string& path, 
     appendProfile(path, p);
 }
 
-void deleteProfile(vector<Profile>& profiles, bool& loaded, const string& path, const string& name) {
+bool deleteProfile(vector<Profile>& profiles, bool& loaded, const string& path, const string& name) {
     listProfiles(profiles, loaded, path);
-
+ 
     for (int i = 0; i < profiles.size(); i++) {
         if (profiles[i].name == name) {
             profiles.erase(profiles.begin() + i);
-            break;
+            saveAllProfiles(path, profiles);
+            return true;
         }
     }
-
-    saveAllProfiles(path, profiles);
+ 
+    return false;
 }

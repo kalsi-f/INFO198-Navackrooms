@@ -1,5 +1,9 @@
 #include "User.h"
- 
+
+#include <cstring>  // char
+#include <fstream> // archivos
+#include <iostream> 
+#include <sstream> // stringstream 
 using namespace std;
  
 vector<User> loadUsers(const string& path, vector<Profile>& profiles) {
@@ -86,18 +90,18 @@ void createUser(vector<User>& users, bool& loaded, const string& path, vector<Pr
     appendUser(path, u);
 }
  
-void deleteUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, int id) {
+bool deleteUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, int id) {
     listUsers(users, loaded, path, profiles);
  
     for (int i = 0; i < users.size(); i++) {
         if (users[i].id == id) {
-            if (users[i].profile->name == "ADMIN") {
-                cout << "Alerta: estas eliminando un usuario ADMIN. Verifica que sea correcto." << endl;
-            }
             users.erase(users.begin() + i);
-            break;
+            saveAllUsers(path, users);
+            return true;
         }
     }
  
-    saveAllUsers(path, users);
+    return false;
 }
+ 
+
