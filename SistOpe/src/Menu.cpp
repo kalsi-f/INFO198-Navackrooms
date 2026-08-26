@@ -101,14 +101,30 @@ void listProfilesMenu(vector<Profile>& profiles, bool& profilesLoaded, const str
     }
 }
 // ELIMINAR PERFIL
-void deleteProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile) {
+void deleteProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile,
+                        vector<User>& users, bool& usersLoaded, const string& userFile) {
+
     listProfiles(profiles, profilesLoaded, profileFile);
+    listUsers(users, usersLoaded, userFile, profiles);   
 
     cout << "Nombre del perfil a eliminar: ";
-    string name;
-    getline(cin, name);
+    string namef;
+    getline(cin, namef);
 
-    bool deleted = deleteProfile(profiles, profilesLoaded, profileFile, name);
+    bool hasUsers = false;                                 
+    for (User& u : users) {                                 
+        if (u.profile->name == namef) {                      
+            hasUsers = true;                                 
+            break;                                            
+        }                                                     
+    }                                                          
+
+    if (hasUsers) {                                            
+        cout << "Error: no es posible eliminar, ya existen usuarios con este perfil asignado." << endl;
+        return;                                                 
+    }                                                           
+
+    bool deleted = deleteProfile(profiles, profilesLoaded, profileFile, namef);
     if (deleted) {
         cout << "Perfil eliminado." << endl;
     } else {
@@ -116,7 +132,8 @@ void deleteProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const st
     }
 }
 
-void runProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile) {
+void runProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile,
+                     vector<User>& users, bool& usersLoaded, const string& userFile)  {
     int option = -1;
 
     while (option != 0) {
@@ -138,7 +155,7 @@ void runProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const strin
                 listProfilesMenu(profiles, profilesLoaded, profileFile);
                 break;
             case 3:
-                deleteProfileMenu(profiles, profilesLoaded, profileFile);
+                deleteProfileMenu(profiles, profilesLoaded, profileFile, users, usersLoaded, userFile);
                 break;
         }
     }
@@ -374,7 +391,7 @@ void runMainMenu(vector<Profile>& profiles, bool& profilesLoaded,
                 runUserMenu(users, usersLoaded, userFile, profiles, profilesLoaded, profileFile);
                 break;
             case 2:
-                runProfileMenu(profiles, profilesLoaded, profileFile);
+                runProfileMenu(profiles, profilesLoaded, profileFile, users, usersLoaded, userFile);
                 break;
         }
     }
