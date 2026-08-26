@@ -11,39 +11,74 @@ vector<Profile> loadProfiles() {
     ifstream file(ENV_CONFIG.PROFILES_FILE_PATH);
 
     if (!file.is_open()) {
-        cerr << "Error: no se pudo abrir el archivo '" << ENV_CONFIG.PROFILES_FILE_PATH << "'" << endl;
-        exit(1);
+        throw runtime_error("Error: no se pudo abrir el archivo '" + string(ENV_CONFIG.PROFILES_FILE_PATH) + "'");
     }
 
     vector<Profile> profiles; // vector de structs Profile
     string line;
-
+    int lineNumber = 0;
+ 
     while (getline(file, line)) {
+        lineNumber++;
+
+        if (line.empty()) {
+            throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
+                                string(ENV_CONFIG.PROFILES_FILE_PATH) + 
+                                "' esta vacia. No se permiten lineas en blanco.");
+        }
+
+        // if (line.empty()) {
+        //    continue;
+        // }
+ 
         int cutPos = line.find(';');
+
+        
+        if (cutPos == (int)string::npos || cutPos == 0) {
+            throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
+                                string(ENV_CONFIG.PROFILES_FILE_PATH) + 
+                                "' tiene formato invalido (falta ';' o falta el nombre): " + line);
+        }
+ 
         string name = line.substr(0, cutPos);
         string optionsText = line.substr(cutPos + 1);
-
+ 
         Profile p;
         p.name = name;
-
+ 
         stringstream ss(optionsText);
         string option;
         while (getline(ss, option, ',')) {
-            p.options.push_back(stoi(option));
+            try {
+                size_t pos;
+                int value = stoi(option, &pos);
+                if (pos != option.size()) {
+                    throw invalid_argument("sobra texto no numerico");
+                }
+                p.options.push_back(value);
+            } catch (const invalid_argument&) {
+                throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
+                                    string(ENV_CONFIG.PROFILES_FILE_PATH) + 
+                                    "' tiene una opcion invalida ('" + option + "'): " + line);
+            } catch (const out_of_range&) {
+                throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
+                                    string(ENV_CONFIG.PROFILES_FILE_PATH) + 
+                                    "' tiene un numero demasiado grande ('" + option + "'): " + line);
+            }
         }
-
-        profiles.push_back(p); // agrego al vector de structs Profile
+ 
+        profiles.push_back(p); // agrega al vector
     }
-
+ 
     return profiles;
 }
+
 
 void appendProfile(const Profile& p) {
     ofstream file(ENV_CONFIG.PROFILES_FILE_PATH, ios::app); // ios app para agregar al final sin borrar lo que existe (tipos de ios::)
 
     if (!file.is_open()) {
-        cerr << "Error: no se pudo abrir el archivo '" << ENV_CONFIG.PROFILES_FILE_PATH << "'" << endl;
-        exit(1);
+        throw runtime_error("Error: no se pudo abrir el archivo '" + string(ENV_CONFIG.PROFILES_FILE_PATH) + "' para escritura");
     }
 
     file << p.name << ";";

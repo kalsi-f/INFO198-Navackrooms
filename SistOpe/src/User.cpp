@@ -11,30 +11,61 @@ Users loadUsers(vector<Profile> &profiles) {
     ifstream file(ENV_CONFIG.USERS_FILE_PATH);
  
     if (!file.is_open()) {
-        cerr << "Error: no se pudo abrir el archivo '" << ENV_CONFIG.USERS_FILE_PATH << "'" << endl;
-        exit(1);
+        throw runtime_error("Error: no se pudo abrir el archivo '" + string(ENV_CONFIG.USERS_FILE_PATH) + "'");
     }
  
     Users users;
 
     users.currentId = -1;
     string line;
+    int lineNumber = 0;
  
     while (getline(file, line)) {
+        lineNumber++;
+
+        if (line.empty()) {
+            throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
+                                string(ENV_CONFIG.USERS_FILE_PATH) + 
+                                "' esta vacia. No se permiten lineas en blanco.");
+        }
+
+        //if (line.empty()) {
+        //    continue;
+        //}
+ 
         stringstream ss(line);
         string idText, name, username, password, profileText;
  
-        getline(ss, idText, ';');
-        getline(ss, name, ';');
-        getline(ss, username, ';');
-        getline(ss, password, ';');
-        getline(ss, profileText, ';');
+        bool ok = (bool)getline(ss, idText, ';')
+                  && (bool)getline(ss, name, ';')
+                  && (bool)getline(ss, username, ';')
+                  && (bool)getline(ss, password, ';')
+                  && (bool)getline(ss, profileText, ';');
+ 
+        if (!ok) {
+            throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
+                                string(ENV_CONFIG.USERS_FILE_PATH) + 
+                                "' no tiene los 5 campos esperados: " + line);
+        }
  
         User u;
-        u.id = stoi(idText);
-        
-        if (u.id > users.currentId) users.currentId = u.id;
-
+ 
+        try {
+            size_t pos;
+            u.id = stoi(idText, &pos);
+            if (pos != idText.size()) {
+                throw invalid_argument("sobra texto no numerico");
+            }
+        } catch (const invalid_argument&) {
+            throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
+                                string(ENV_CONFIG.USERS_FILE_PATH) + 
+                                "' tiene un id invalido ('" + idText + "'): " + line);
+        }
+ 
+        if (u.id > users.currentId) {
+            users.currentId = u.id;
+        }
+ 
         strncpy(u.name, name.c_str(), sizeof(u.name) - 1);
         u.name[sizeof(u.name) - 1] = '\0';
  
@@ -44,6 +75,7 @@ Users loadUsers(vector<Profile> &profiles) {
         strncpy(u.password, password.c_str(), sizeof(u.password) - 1);
         u.password[sizeof(u.password) - 1] = '\0';
  
+        u.profile = nullptr;
         for (int i = 0; i < profiles.size(); i++) {
             if (profiles[i].name == profileText) {
                 u.profile = &profiles[i];
@@ -51,20 +83,30 @@ Users loadUsers(vector<Profile> &profiles) {
             }
         }
  
+        if (u.profile == nullptr) {
+            throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
+                                string(ENV_CONFIG.USERS_FILE_PATH) + 
+                                "' referencia un perfil inexistente ('" + profileText + "'): " + line);
+        }
+ 
         users.data.push_back(u);
     }
  
     return users;
 }
- 
+
+    
+
+
+
+
 void appendUser(const User& u) {
     ofstream file(ENV_CONFIG.USERS_FILE_PATH, ios::app);
  
     if (!file.is_open()) {
-        cerr << "Error: no se pudo abrir el archivo '" << ENV_CONFIG.USERS_FILE_PATH << "'" << endl;
-        exit(1);
+        throw runtime_error("Error: no se pudo abrir el archivo '" + string(ENV_CONFIG.USERS_FILE_PATH) + "'");
     }
- 
+
     file << u.id << ";"
          << u.name << ";"
          << u.username << ";"
