@@ -21,11 +21,6 @@ operación.
 
 ## Cómo ejecutar
 
-### Requisitos
-
-- `g++` con soporte para C++17.
-- `make`.
-
 ### Compilar y ejecutar
 
 Desde la raíz del proyecto (donde está el `Makefile` y el `.env`):
@@ -33,16 +28,8 @@ Desde la raíz del proyecto (donde está el `Makefile` y el `.env`):
 ```bash
 make run
 ```
-
 Esto compila todos los `.cpp` dentro de `src/` (detectados automáticamente)
 y ejecuta el binario resultante (`sistope`).
-
-Otros comandos disponibles:
-
-```bash
-make        # solo compila, sin ejecutar
-make clean  # elimina el ejecutable, para compilar desde cero
-```
 
 ## Variables de entorno
 

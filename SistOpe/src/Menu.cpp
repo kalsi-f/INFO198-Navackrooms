@@ -125,12 +125,25 @@ void listProfilesMenu(vector<Profile>& profiles) {
     }
 }
 // ELIMINAR PERFIL
-void deleteProfileMenu(vector<Profile>& profiles) {
+void deleteProfileMenu(vector<Profile>& profiles, Users& users) {
     cout << "Nombre del perfil a eliminar: ";
-    string name;
-    getline(cin, name);
+    string namef;
+    getline(cin, namef);
 
-    bool deleted = deleteProfile(profiles, name);
+    bool hasUsers = false;                                 
+    for (User& u : users.data) {                                 
+        if (u.profile->name == namef) {                      
+            hasUsers = true;                                 
+            break;                                            
+        }                                                     
+    }                                                          
+
+    if (hasUsers) {                                            
+        cout << "Error: no es posible eliminar, ya existen usuarios con este perfil asignado." << endl;
+        return;                                                 
+    }                                                           
+
+    bool deleted = deleteProfile(profiles, namef);
     if (deleted) {
         cout << "Perfil eliminado." << endl;
     } else {
@@ -144,10 +157,6 @@ void createProfileMenu(vector<Profile>& profiles, Users& users) {
 
 void listProfilesMenu(vector<Profile>& profiles, Users& users) {
     return listProfilesMenu(profiles);
-}
-
-void deleteProfileMenu(vector<Profile>& profiles, Users& users) {
-    return deleteProfileMenu(profiles);
 }
 
 void runProfileMenu(vector<Profile>& profiles, Users& users) {

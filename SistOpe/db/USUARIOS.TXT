@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 8;Jorge peron;1233;jor;GENERAL
 9;Pepe;pepe;popo;GENERAL
+=======
+1;Jaime Guzman;mori;123456;ADMIN
+5;Fabian Reyes;kalsi;45678;GENERAL
+>>>>>>> fabian
