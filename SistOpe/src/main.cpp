@@ -12,7 +12,7 @@ int main() {
     ENV_CONFIG.USERS_FILE_PATH = getEnvVar("USER_FILE");
 
     vector<Profile> profiles = loadProfiles();
-    vector<User> users = loadUsers(profiles);
+    Users users = loadUsers(profiles);
 
     runMainMenu(profiles, users);
 

@@ -7,7 +7,7 @@
 #include <sstream> // stringstream 
 using namespace std;
  
-vector<User> loadUsers(vector<Profile> &profiles) {
+Users loadUsers(vector<Profile> &profiles) {
     ifstream file(ENV_CONFIG.USERS_FILE_PATH);
  
     if (!file.is_open()) {
@@ -15,7 +15,9 @@ vector<User> loadUsers(vector<Profile> &profiles) {
         exit(1);
     }
  
-    vector<User> users;
+    Users users;
+
+    users.currentId = -1;
     string line;
  
     while (getline(file, line)) {
@@ -30,7 +32,9 @@ vector<User> loadUsers(vector<Profile> &profiles) {
  
         User u;
         u.id = stoi(idText);
- 
+        
+        if (u.id > users.currentId) users.currentId = u.id;
+
         strncpy(u.name, name.c_str(), sizeof(u.name) - 1);
         u.name[sizeof(u.name) - 1] = '\0';
  
@@ -47,7 +51,7 @@ vector<User> loadUsers(vector<Profile> &profiles) {
             }
         }
  
-        users.push_back(u);
+        users.data.push_back(u);
     }
  
     return users;
@@ -68,12 +72,12 @@ void appendUser(const User& u) {
          << u.profile->name << endl;
 }
  
-void saveAllUsers(const vector<User>& users) {
+void saveAllUsers(const Users& users) {
     ofstream file(ENV_CONFIG.USERS_FILE_PATH); // sin ios::append => reescribe desde cero
  
-    for (int i = 0; i < users.size(); i++) {
-        file << users[i].id << ";" << users[i].name << ";" << users[i].username << ";"
-             << users[i].password << ";" << users[i].profile->name << endl;
+    for (int i = 0; i < users.data.size(); i++) {
+        file << users.data[i].id << ";" << users.data[i].name << ";" << users.data[i].username << ";"
+             << users.data[i].password << ";" << users.data[i].profile->name << endl;
     }
 }
  
@@ -87,17 +91,17 @@ vector<User>& listUsers(vector<User>& users, bool& loaded, const string& path, v
 }
 */    
  
-void createUser(vector<Profile>& profiles, vector<User>& users, const User& u) {
+void createUser(vector<Profile>& profiles, Users& users, const User& u) {
     // listUsers(users, loaded, path, profiles); // asegura que este cargado antes de agregar
-    users.push_back(u);
+    users.data.push_back(u);
     appendUser(u);
 }
  
-bool deleteUser(vector<Profile>& profiles, vector<User>& users, int id) {
+bool deleteUser(vector<Profile>& profiles, Users& users, int id) {
  
-    for (int i = 0; i < users.size(); i++) {
-        if (users[i].id == id) {
-            users.erase(users.begin() + i);
+    for (int i = 0; i < users.data.size(); i++) {
+        if (users.data[i].id == id) {
+            users.data.erase(users.data.begin() + i);
             saveAllUsers(users);
             return true;
         }
