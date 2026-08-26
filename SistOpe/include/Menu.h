@@ -10,8 +10,6 @@ using namespace std;
 // muestra el menu principal (0=Exit, 1=Users, 2=Profiles) y corre
 // el programa hasta que el usuario elige salir. las listas se pasan
 // por referencia para que los datos persistan durante toda la ejecucion.
-void runMainMenu(vector<Profile>& profiles, bool& profilesLoaded,
-                  vector<User>& users, bool& usersLoaded,
-                  const string& userFile, const string& profileFile);
+void runMainMenu(vector<Profile>& profiles, vector<User>& users);
 
 #endif

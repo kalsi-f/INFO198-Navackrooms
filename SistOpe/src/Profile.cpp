@@ -1,4 +1,5 @@
 #include "Profile.h"
+#include "config/EnvConfig.h"
 
 #include <cstdlib>
 #include <fstream>
@@ -6,11 +7,11 @@
 #include <sstream>
 using namespace std;
 
-vector<Profile> loadProfiles(const string& path) {
-    ifstream file(path);
+vector<Profile> loadProfiles() {
+    ifstream file(ENV_CONFIG.PROFILES_FILE_PATH);
 
     if (!file.is_open()) {
-        cerr << "Error: no se pudo abrir el archivo '" << path << "'" << endl;
+        cerr << "Error: no se pudo abrir el archivo '" << ENV_CONFIG.PROFILES_FILE_PATH << "'" << endl;
         exit(1);
     }
 
@@ -37,11 +38,11 @@ vector<Profile> loadProfiles(const string& path) {
     return profiles;
 }
 
-void appendProfile(const string& path, const Profile& p) {
-    ofstream file(path, ios::app); // ios app para agregar al final sin borrar lo que existe (tipos de ios::)
+void appendProfile(const Profile& p) {
+    ofstream file(ENV_CONFIG.PROFILES_FILE_PATH, ios::app); // ios app para agregar al final sin borrar lo que existe (tipos de ios::)
 
     if (!file.is_open()) {
-        cerr << "Error: no se pudo abrir el archivo '" << path << "'" << endl;
+        cerr << "Error: no se pudo abrir el archivo '" << ENV_CONFIG.PROFILES_FILE_PATH << "'" << endl;
         exit(1);
     }
 
@@ -57,8 +58,8 @@ void appendProfile(const string& path, const Profile& p) {
     file << endl;
 }
 
-void saveAllProfiles(const string& path, const vector<Profile>& profiles) {
-    ofstream file(path); // lo mismo que ios::out, pero este borra todo el contenido previo
+void saveAllProfiles(const vector<Profile>& profiles) {
+    ofstream file(ENV_CONFIG.PROFILES_FILE_PATH); // lo mismo que ios::out, pero este borra todo el contenido previo
 
     for (int i = 0; i < profiles.size(); i++) {
         file << profiles[i].name << ";";
@@ -72,6 +73,7 @@ void saveAllProfiles(const string& path, const vector<Profile>& profiles) {
     }
 }
 
+/*
 vector<Profile>& listProfiles(vector<Profile>& profiles, bool& loaded, const string& path) {
     if (!loaded) {
         profiles = loadProfiles(path);
@@ -79,20 +81,18 @@ vector<Profile>& listProfiles(vector<Profile>& profiles, bool& loaded, const str
     }
     return profiles;
 }
+*/
 
-void createProfile(vector<Profile>& profiles, bool& loaded, const string& path, const Profile& p) {
-    listProfiles(profiles, loaded, path); // asegura que este cargado antes de agregar
+void createProfile(vector<Profile>& profiles, const Profile& p) {
     profiles.push_back(p);
-    appendProfile(path, p);
+    appendProfile(p);
 }
 
-bool deleteProfile(vector<Profile>& profiles, bool& loaded, const string& path, const string& name) {
-    listProfiles(profiles, loaded, path);
- 
+bool deleteProfile(vector<Profile>& profiles, const string& name) {
     for (int i = 0; i < profiles.size(); i++) {
         if (profiles[i].name == name) {
             profiles.erase(profiles.begin() + i);
-            saveAllProfiles(path, profiles);
+            saveAllProfiles(profiles);
             return true;
         }
     }

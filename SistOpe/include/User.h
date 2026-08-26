@@ -17,24 +17,24 @@ struct User {
 // persistencia
 // lee USUARIOS.TXT y devuelve la lista de usuarios cargados,
 // con el puntero "profile" de cada uno por nombre
-vector<User> loadUsers(const string& path, vector<Profile>& profiles);
+vector<User> loadUsers(vector<Profile> &profiles);
  
 // agrega una nueva linea al final de USUARIOS.TXT
 void appendUser(const string& path, const User& u);
  
 // reescribe el archivo completo desde cero con la lista actual
-void saveAllUsers(const string& path, const vector<User>& users);
+void saveAllUsers(const vector<User>& users);
  
 // si "loaded" es false, carga desde archivo y lo marca como true.
 // si ya es true, devuelve directamente la lista que ya esta en memoria.
-vector<User>& listUsers(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles);
+// vector<User>& listUsers(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles);
  
 // agrega el usuario a la lista en memoria y al archivo
-void createUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, const User& u);
+void createUser(vector<Profile>& profiles, vector<User>& users, const User& u);
  
 // elimina el usuario por id. si su perfil es "ADMIN", imprime una alerta
 // pero igual lo elimina (solo advierte, no bloquea)
-bool deleteUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, int id);
+bool deleteUser(vector<Profile>& profiles, vector<User>& users, int id);
  
 #endif
  

@@ -1,4 +1,5 @@
 #include "User.h"
+#include "config/EnvConfig.h"
 
 #include <cstring>  // char
 #include <fstream> // archivos
@@ -6,11 +7,11 @@
 #include <sstream> // stringstream 
 using namespace std;
  
-vector<User> loadUsers(const string& path, vector<Profile>& profiles) {
-    ifstream file(path);
+vector<User> loadUsers(vector<Profile> &profiles) {
+    ifstream file(ENV_CONFIG.USERS_FILE_PATH);
  
     if (!file.is_open()) {
-        cerr << "Error: no se pudo abrir el archivo '" << path << "'" << endl;
+        cerr << "Error: no se pudo abrir el archivo '" << ENV_CONFIG.USERS_FILE_PATH << "'" << endl;
         exit(1);
     }
  
@@ -52,11 +53,11 @@ vector<User> loadUsers(const string& path, vector<Profile>& profiles) {
     return users;
 }
  
-void appendUser(const string& path, const User& u) {
-    ofstream file(path, ios::app);
+void appendUser(const User& u) {
+    ofstream file(ENV_CONFIG.USERS_FILE_PATH, ios::app);
  
     if (!file.is_open()) {
-        cerr << "Error: no se pudo abrir el archivo '" << path << "'" << endl;
+        cerr << "Error: no se pudo abrir el archivo '" << ENV_CONFIG.USERS_FILE_PATH << "'" << endl;
         exit(1);
     }
  
@@ -67,8 +68,8 @@ void appendUser(const string& path, const User& u) {
          << u.profile->name << endl;
 }
  
-void saveAllUsers(const string& path, const vector<User>& users) {
-    ofstream file(path); // sin ios::append => reescribe desde cero
+void saveAllUsers(const vector<User>& users) {
+    ofstream file(ENV_CONFIG.USERS_FILE_PATH); // sin ios::append => reescribe desde cero
  
     for (int i = 0; i < users.size(); i++) {
         file << users[i].id << ";" << users[i].name << ";" << users[i].username << ";"
@@ -76,6 +77,7 @@ void saveAllUsers(const string& path, const vector<User>& users) {
     }
 }
  
+/*
 vector<User>& listUsers(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles) {
     if (!loaded) {
         users = loadUsers(path, profiles);
@@ -83,20 +85,20 @@ vector<User>& listUsers(vector<User>& users, bool& loaded, const string& path, v
     }
     return users;
 }
+*/    
  
-void createUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, const User& u) {
-    listUsers(users, loaded, path, profiles); // asegura que este cargado antes de agregar
+void createUser(vector<Profile>& profiles, vector<User>& users, const User& u) {
+    // listUsers(users, loaded, path, profiles); // asegura que este cargado antes de agregar
     users.push_back(u);
-    appendUser(path, u);
+    appendUser(u);
 }
  
-bool deleteUser(vector<User>& users, bool& loaded, const string& path, vector<Profile>& profiles, int id) {
-    listUsers(users, loaded, path, profiles);
+bool deleteUser(vector<Profile>& profiles, vector<User>& users, int id) {
  
     for (int i = 0; i < users.size(); i++) {
         if (users[i].id == id) {
             users.erase(users.begin() + i);
-            saveAllUsers(path, users);
+            saveAllUsers(users);
             return true;
         }
     }

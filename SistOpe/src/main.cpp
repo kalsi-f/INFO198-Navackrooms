@@ -5,19 +5,21 @@
 
 using namespace std;
 
+
+
 int main() {
     loadEnv();
 
-    vector<Profile> profiles;
-    bool profilesLoaded = false;
+    ENV_CONFIG.PROFILES_FILE_PATH = getEnvVar("PERFIL_FILE");
+    ENV_CONFIG.USERS_FILE_PATH = getEnvVar("USER_FILE");
 
-    vector<User> users;
-    bool usersLoaded = false;
+    vector<Profile> profiles = loadProfiles();
+    vector<User> users = loadUsers(profiles);
 
-    string userFile = getEnvVar("USER_FILE");
-    string profileFile = getEnvVar("PERFIL_FILE");
+    
+    
 
-    runMainMenu(profiles, profilesLoaded, users, usersLoaded, userFile, profileFile);
+    runMainMenu(profiles, users);
 
     return 0;
 }

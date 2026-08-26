@@ -4,7 +4,10 @@
 #include <fstream>
 #include <iostream>
 using namespace std;
- 
+
+
+struct EnvConfig ENV_CONFIG;
+
 void loadEnv(const string& path) {
     ifstream file(path);
  

@@ -12,24 +12,24 @@ struct Profile {
  
 // persistencia 
 // lee el archivo txt
-vector<Profile> loadProfiles(const string& path);
+vector<Profile> loadProfiles();
 
 // agrega una nueva linea al final del USUARIOS.TXT 
-void appendProfile(const string& path, const Profile& p);
+void appendProfile(const Profile& p);
 
 // reescribe el archivo completo desde cero con la lista actual
-void saveAllProfiles(const string& path, const vector<Profile>& profiles);
+void saveAllProfiles(const vector<Profile>& profiles);
  
 // si "loaded" es false, carga desde archivo y lo marca como true.
 // si ya es true, devuelve directamente la lista que ya esta en memoria.
-vector<Profile>& listProfiles(vector<Profile>& profiles, bool& loaded, const string& path);
+// vector<Profile>& listProfiles(vector<Profile>& profiles, bool& loaded, const string& path);
  
 // agrega el perfil a la lista en memoria y al archivo
-void createProfile(vector<Profile>& profiles, bool& loaded, const string& path, const Profile& p);
+void createProfile(vector<Profile>& profiles, const Profile& p);
  
 // elimina el perfil (por nombre) de la lista en memoria y reescribe el archivo
 // devuelve true si se encontro y elimino, false si no existia ese nombre.
-bool deleteProfile(vector<Profile>& profiles, bool& loaded, const string& path, const string& name);
+bool deleteProfile(vector<Profile>& profiles, const string& name);
 
 
 #endif 
