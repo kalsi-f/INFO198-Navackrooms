@@ -4,17 +4,44 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+
+#define CLEAR_SCREEN_CODE "\033[2J\033[3J\033[2J\033[1;1H"  // Deberia limpiar la pantalla
+
 using namespace std;
 
-namespace {
+
 // ingreso de saltos de linea -> ENTER
 void clearBuffer() {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
+void dynamicListMenu(vector<Profile>& profiles, Users& users, const string &title, vector<MenuOption> &options) {
+    int option = -1;
+
+    cout << CLEAR_SCREEN_CODE;
+    
+    while (option != 0) {
+        cout << "— " << title << " —" << endl;
+        cout << "0. Retroceder" << endl;
+        for (size_t i = 0; i < options.size(); i++) {
+            cout << i + 1 << ". " << options[i].name << endl; 
+        }
+
+        cout << "Opcion: ";
+        cin >> option;
+        clearBuffer();
+        cout << CLEAR_SCREEN_CODE;
+
+        if (0 < option && option <= options.size()) options[option-1].callback(profiles, users);
+        else if (option == 0) break;
+        else cout << "Error: Opción inválida" << endl;
+
+    }
+}
+
 void printProfiles(vector<Profile>& profiles) {
     for (int i = 0; i < profiles.size(); i++) {
-        cout << i + 1 << ") " << profiles[i].name << endl;
+        cout << i + 1 << ". " << profiles[i].name << endl;
     }
 }
 
@@ -39,9 +66,7 @@ vector<int> parseOptions(const string& text) {
 
 // MENU DE PERFILES
 // CREAR PERFIL
-void createProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile) {
-    listProfiles(profiles, profilesLoaded, profileFile);
-
+void createProfileMenu(vector<Profile>& profiles) {
     Profile p;
 
     while (true) {
@@ -85,12 +110,11 @@ void createProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const st
         }
     }
 
-    createProfile(profiles, profilesLoaded, profileFile, p);
+    createProfile(profiles, p);
     cout << "Perfil creado." << endl;
 }
 // LISTAR PERFIL
-void listProfilesMenu(vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile) {
-    listProfiles(profiles, profilesLoaded, profileFile);
+void listProfilesMenu(vector<Profile>& profiles) {
 
     for (Profile& p : profiles) {
         cout << p.name << " -> opciones: ";
@@ -101,18 +125,13 @@ void listProfilesMenu(vector<Profile>& profiles, bool& profilesLoaded, const str
     }
 }
 // ELIMINAR PERFIL
-void deleteProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile,
-                        vector<User>& users, bool& usersLoaded, const string& userFile) {
-
-    listProfiles(profiles, profilesLoaded, profileFile);
-    listUsers(users, usersLoaded, userFile, profiles);   
-
+void deleteProfileMenu(vector<Profile>& profiles, Users& users) {
     cout << "Nombre del perfil a eliminar: ";
     string namef;
     getline(cin, namef);
 
     bool hasUsers = false;                                 
-    for (User& u : users) {                                 
+    for (User& u : users.data) {                                 
         if (u.profile->name == namef) {                      
             hasUsers = true;                                 
             break;                                            
@@ -124,7 +143,7 @@ void deleteProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const st
         return;                                                 
     }                                                           
 
-    bool deleted = deleteProfile(profiles, profilesLoaded, profileFile, namef);
+    bool deleted = deleteProfile(profiles, namef);
     if (deleted) {
         cout << "Perfil eliminado." << endl;
     } else {
@@ -132,40 +151,30 @@ void deleteProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const st
     }
 }
 
-void runProfileMenu(vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile,
-                     vector<User>& users, bool& usersLoaded, const string& userFile)  {
-    int option = -1;
+void createProfileMenu(vector<Profile>& profiles, Users& users) {
+    return createProfileMenu(profiles);
+}
 
-    while (option != 0) {
-        cout << "\n-- Menu de Perfiles --" << endl;
-        cout << "0) Volver" << endl;
-        cout << "1) Crear Perfil" << endl;
-        cout << "2) Listar Perfiles" << endl;
-        cout << "3) Eliminar Perfil" << endl;
-        cout << "Opcion: ";
+void listProfilesMenu(vector<Profile>& profiles, Users& users) {
+    return listProfilesMenu(profiles);
+}
 
-        cin >> option;
-        clearBuffer();
+void runProfileMenu(vector<Profile>& profiles, Users& users) {
+    vector<MenuOption> options =  {
+        {"Crear Perfil", createProfileMenu},
+        {"Listar Perfiles", listProfilesMenu},
+        {"Eliminar Perfil", deleteProfileMenu}
+    };
 
-        switch (option) {
-            case 1:
-                createProfileMenu(profiles, profilesLoaded, profileFile);
-                break;
-            case 2:
-                listProfilesMenu(profiles, profilesLoaded, profileFile);
-                break;
-            case 3:
-                deleteProfileMenu(profiles, profilesLoaded, profileFile, users, usersLoaded, userFile);
-                break;
-        }
-    }
+    dynamicListMenu(profiles, users, "Menu de Perfiles", options);
 }
 
 // MENU DE USUARIOS
 // pide el Id repitiendo hasta que sea valido y no exista todavia.
 // devuelve true y deja el id en "id" si se ingreso correctamente,
 // false si el usuario cancelo dejando la linea vacia.
-bool askNewUserId(vector<User>& users, int& id) {
+/*
+bool askNewUserId(Users& users, int& id) {
     while (true) {
         cout << "Id (vacio para cancelar): ";
         string idText;
@@ -187,7 +196,7 @@ bool askNewUserId(vector<User>& users, int& id) {
         }
 
         bool exists = false;
-        for (User& existing : users) {
+        for (User& existing : users.data) {
             if (existing.id == id) {
                 exists = true;
                 break;
@@ -201,6 +210,7 @@ bool askNewUserId(vector<User>& users, int& id) {
         }
     }
 }
+*/
 
 // muestra los perfiles y pide una opcion repitiendo hasta que sea valida.
 // devuelve el puntero elegido, o nullptr si el usuario cancelo dejando vacio.
@@ -252,18 +262,10 @@ string askNonEmpty(const string& label) {
 }
 
 // CREAR USUARIO
-void createUserMenu(vector<User>& users, bool& usersLoaded, const string& userFile,
-                     vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile) {
-    listProfiles(profiles, profilesLoaded, profileFile);
-    listUsers(users, usersLoaded, userFile, profiles);
+void createUserMenu(vector<Profile>& profiles, Users& users) {
 
     User u;
-    int id;
-    if (!askNewUserId(users, id)) {
-        cout << "Creacion cancelada." << endl;
-        return;
-    }
-    u.id = id;
+    u.id = users.currentId + 1;
 
     string name = askNonEmpty("Nombre");
     strncpy(u.name, name.c_str(), sizeof(u.name) - 1);
@@ -284,26 +286,22 @@ void createUserMenu(vector<User>& users, bool& usersLoaded, const string& userFi
     }
     u.profile = chosen;
 
-    createUser(users, usersLoaded, userFile, profiles, u);
+    createUser(profiles, users, u);
+
+    users.currentId++;
+
     cout << "Usuario creado." << endl;
 }
 
 // LISTAR USUARIO 
-void listUsersMenu(vector<User>& users, bool& usersLoaded, const string& userFile,
-                    vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile) {
-    listProfiles(profiles, profilesLoaded, profileFile);
-    listUsers(users, usersLoaded, userFile, profiles);
-
-    for (User& u : users) {
+void listUsersMenu(vector<Profile>& profiles, Users& users) {
+    for (User& u : users.data) {
         cout << u.id << " - " << u.name << " (" << u.username << ") perfil=" << u.profile->name << endl;
     }
 }
 
 // ELIMINAR USUARIO
-void deleteUserMenu(vector<User>& users, bool& usersLoaded, const string& userFile,
-                     vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile) {
-    listProfiles(profiles, profilesLoaded, profileFile);
-    listUsers(users, usersLoaded, userFile, profiles);
+void deleteUserMenu(vector<Profile>& profiles, Users& users) {
 
     cout << "Id del usuario a eliminar: ";
     int id;
@@ -311,7 +309,7 @@ void deleteUserMenu(vector<User>& users, bool& usersLoaded, const string& userFi
     clearBuffer();
 
     User* target = nullptr;
-    for (User& u : users) {
+    for (User& u : users.data) {
         if (u.id == id) {
             target = &u;
             break;
@@ -334,65 +332,28 @@ void deleteUserMenu(vector<User>& users, bool& usersLoaded, const string& userFi
         }
     }
 
-    deleteUser(users, usersLoaded, userFile, profiles, id);
+    deleteUser(profiles, users, id);
     cout << "Usuario eliminado." << endl;
 }
 
-void runUserMenu(vector<User>& users, bool& usersLoaded, const string& userFile,
-                  vector<Profile>& profiles, bool& profilesLoaded, const string& profileFile) {
-    int option = -1;
+void runUserMenu(vector<Profile>& profiles, Users& users) {
+    vector<MenuOption> options = {
+        {"Crear Usuario", createUserMenu},
+        {"Listar Usuarios", listUsersMenu},
+        {"Eliminar Usuario", deleteUserMenu}
+    };
 
-    while (option != 0) {
-        cout << "\n-- Menu de Usuarios --" << endl;
-        cout << "0) Volver" << endl;
-        cout << "1) Crear Usuario" << endl;
-        cout << "2) Listar Usuarios" << endl;
-        cout << "3) Eliminar Usuario" << endl;
-        cout << "Opcion: ";
-
-        cin >> option;
-        clearBuffer();
-
-        switch (option) {
-            case 1:
-                createUserMenu(users, usersLoaded, userFile, profiles, profilesLoaded, profileFile);
-                break;
-            case 2:
-                listUsersMenu(users, usersLoaded, userFile, profiles, profilesLoaded, profileFile);
-                break;
-            case 3:
-                deleteUserMenu(users, usersLoaded, userFile, profiles, profilesLoaded, profileFile);
-                break;
-        }
-    }
+    dynamicListMenu(profiles, users, "Menu de Usuarios", options);
 }
-
-} 
 
 // MENU PRINCIPAL
 
-void runMainMenu(vector<Profile>& profiles, bool& profilesLoaded,
-                  vector<User>& users, bool& usersLoaded,
-                  const string& userFile, const string& profileFile) {
-    int option = -1;
+void runMainMenu(vector<Profile>& profiles, Users& users) {
+    vector<MenuOption> options = {
+        {"Gestion de Usuarios", runUserMenu},
+        {"Gestion de Perfiles", runProfileMenu}
+    };
 
-    while (option != 0) {
-        cout << "\n-- Menu Principal --" << endl;
-        cout << "0) Salir" << endl;
-        cout << "1) Gestion de Usuarios" << endl;
-        cout << "2) Gestion de Perfiles" << endl;
-        cout << "Opcion: ";
-
-        cin >> option;
-        clearBuffer();
-
-        switch (option) {
-            case 1:
-                runUserMenu(users, usersLoaded, userFile, profiles, profilesLoaded, profileFile);
-                break;
-            case 2:
-                runProfileMenu(profiles, profilesLoaded, profileFile, users, usersLoaded, userFile);
-                break;
-        }
-    }
+    dynamicListMenu(profiles, users, "Menu Principal", options);
+    cout << "Finalización del programa exitosa" << endl;
 }
