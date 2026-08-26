@@ -18,7 +18,6 @@ void clearBuffer() {
 void dynamicListMenu(vector<Profile>& profiles, vector<User>& users, const string &title, vector<MenuOption> &options) {
     int option = -1;
     
-    cout << CLEAR_SCREEN_CODE;
     while (option != 0) {
         cout << "-- " << title << " --" << endl;
         cout << "0) Retroceder" << endl;
