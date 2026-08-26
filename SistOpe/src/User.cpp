@@ -68,7 +68,7 @@ void appendUser(const string& path, const User& u) {
 }
  
 void saveAllUsers(const string& path, const vector<User>& users) {
-    ofstream file(path); // sin ios::append =>  reescribe desde cero
+    ofstream file(path); // sin ios::append => reescribe desde cero
  
     for (int i = 0; i < users.size(); i++) {
         file << users[i].id << ";" << users[i].name << ";" << users[i].username << ";"

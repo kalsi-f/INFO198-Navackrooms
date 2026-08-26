@@ -18,8 +18,9 @@ void loadEnv(const string& path) {
         int equalPos = line.find('=');
         string key = line.substr(0, equalPos);
         string value = line.substr(equalPos + 1);
- 
-        setenv(key.c_str(), value.c_str(), 1);
+        
+        // No sobreescribir las variables de entorno si ya existen
+        setenv(key.c_str(), value.c_str(), 0);
     }
 }
  

@@ -9,7 +9,6 @@ int main() {
     loadEnv();
 
     vector<Profile> profiles;
-
     bool profilesLoaded = false;
 
     vector<User> users;
