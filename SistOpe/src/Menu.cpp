@@ -17,6 +17,8 @@ void clearBuffer() {
 
 void dynamicListMenu(vector<Profile>& profiles, vector<User>& users, const string &title, vector<MenuOption> &options) {
     int option = -1;
+
+    cout << CLEAR_SCREEN_CODE;
     
     while (option != 0) {
         cout << "-- " << title << " --" << endl;
@@ -28,12 +30,12 @@ void dynamicListMenu(vector<Profile>& profiles, vector<User>& users, const strin
         cout << "Opcion: ";
         cin >> option;
         clearBuffer();
+        cout << CLEAR_SCREEN_CODE;
 
         if (0 < option && option < profiles.size()) options[option-1].callback(profiles, users);
         else if (option == 0) break;
         else cout << "Error: Opción inválida" << endl;
 
-        cout << CLEAR_SCREEN_CODE;
     }
 }
 
