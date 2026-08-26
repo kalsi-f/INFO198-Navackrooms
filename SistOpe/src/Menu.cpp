@@ -16,6 +16,7 @@ void clearBuffer() {
 }
 
 void dynamicListMenu(vector<Profile>& profiles, Users& users, const string &title, vector<MenuOption> &options) {
+    string input;
     int option = -1;
 
     cout << CLEAR_SCREEN_CODE;
@@ -28,7 +29,13 @@ void dynamicListMenu(vector<Profile>& profiles, Users& users, const string &titl
         }
 
         cout << "Opcion: ";
-        cin >> option;
+        cin >> input;
+        try {
+            option = stoi(input);
+        }
+        catch (const std::invalid_argument & e) {
+            
+        }
         clearBuffer();
         cout << CLEAR_SCREEN_CODE;
 
