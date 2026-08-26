@@ -4,12 +4,38 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+
+#define CLEAR_SCREEN_CODE "\033[2J\033[1;1H" // Deberia limpiar la pantalla
+
 using namespace std;
 
-namespace {
+
 // ingreso de saltos de linea -> ENTER
 void clearBuffer() {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+void dynamicListMenu(vector<Profile>& profiles, vector<User>& users, const string &title, vector<MenuOption> &options) {
+    int option = -1;
+    
+    cout << CLEAR_SCREEN_CODE;
+    while (option != 0) {
+        cout << "-- " << title << " --" << endl;
+        cout << "0) Retroceder" << endl;
+        for (size_t i = 0; i < options.size(); i++) {
+            cout << i + 1 << ") " << options[i].name << endl; 
+        }
+
+        cout << "Opcion: ";
+        cin >> option;
+        clearBuffer();
+
+        if (0 < option && option < profiles.size()) options[option-1].callback(profiles, users);
+        else if (option == 0) break;
+        else cout << "Error: Opción inválida" << endl;
+
+        cout << CLEAR_SCREEN_CODE;
+    }
 }
 
 void printProfiles(vector<Profile>& profiles) {
@@ -111,32 +137,26 @@ void deleteProfileMenu(vector<Profile>& profiles) {
     }
 }
 
-void runProfileMenu(vector<Profile>& profiles) {
-    int option = -1;
+void createProfileMenu(vector<Profile>& profiles, vector<User>& users) {
+    return createProfileMenu(profiles);
+}
 
-    while (option != 0) {
-        cout << "\n-- Menu de Perfiles --" << endl;
-        cout << "0) Volver" << endl;
-        cout << "1) Crear Perfil" << endl;
-        cout << "2) Listar Perfiles" << endl;
-        cout << "3) Eliminar Perfil" << endl;
-        cout << "Opcion: ";
+void listProfilesMenu(vector<Profile>& profiles, vector<User>& users) {
+    return listProfilesMenu(profiles);
+}
 
-        cin >> option;
-        clearBuffer();
+void deleteProfileMenu(vector<Profile>& profiles, vector<User>& users) {
+    return deleteProfileMenu(profiles);
+}
 
-        switch (option) {
-            case 1:
-                createProfileMenu(profiles);
-                break;
-            case 2:
-                listProfilesMenu(profiles);
-                break;
-            case 3:
-                deleteProfileMenu(profiles);
-                break;
-        }
-    }
+void runProfileMenu(vector<Profile>& profiles, vector<User>& users) {
+    vector<MenuOption> options =  {
+        {"Crear Perfil", createProfileMenu},
+        {"Listar Perfiles", listProfilesMenu},
+        {"Eliminar Perfil", deleteProfileMenu}
+    };
+
+    dynamicListMenu(profiles, users, "Menu de Perfiles", options);
 }
 
 // MENU DE USUARIOS
@@ -307,57 +327,23 @@ void deleteUserMenu(vector<Profile>& profiles, vector<User>& users) {
 }
 
 void runUserMenu(vector<Profile>& profiles, vector<User>& users) {
-    int option = -1;
+    vector<MenuOption> options = {
+        {"Crear Usuario", createUserMenu},
+        {"Listar Usuarios", listUsersMenu},
+        {"Eliminar Usuario", deleteUserMenu}
+    };
 
-    while (option != 0) {
-        cout << "\n-- Menu de Usuarios --" << endl;
-        cout << "0) Volver" << endl;
-        cout << "1) Crear Usuario" << endl;
-        cout << "2) Listar Usuarios" << endl;
-        cout << "3) Eliminar Usuario" << endl;
-        cout << "Opcion: ";
-
-        cin >> option;
-        clearBuffer();
-
-        switch (option) {
-            case 1:
-                createUserMenu(profiles, users);
-                break;
-            case 2:
-                listUsersMenu(profiles, users);
-                break;
-            case 3:
-                deleteUserMenu(profiles, users);
-                break;
-        }
-    }
+    dynamicListMenu(profiles, users, "Menu de Usuarios", options);
 }
-
-} 
 
 // MENU PRINCIPAL
 
 void runMainMenu(vector<Profile>& profiles, vector<User>& users) {
-    int option = -1;
+    vector<MenuOption> options = {
+        {"Gestion de Usuarios", runUserMenu},
+        {"Gestion de Perfiles", runProfileMenu}
+    };
 
-    while (option != 0) {
-        cout << "\n-- Menu Principal --" << endl;
-        cout << "0) Salir" << endl;
-        cout << "1) Gestion de Usuarios" << endl;
-        cout << "2) Gestion de Perfiles" << endl;
-        cout << "Opcion: ";
-
-        cin >> option;
-        clearBuffer();
-
-        switch (option) {
-            case 1:
-                runUserMenu(profiles, users);
-                break;
-            case 2:
-                runProfileMenu(profiles);
-                break;
-        }
-    }
+    dynamicListMenu(profiles, users, "Menu Principal", options);
+    cout << "Finalización del programa exitosa" << endl;
 }

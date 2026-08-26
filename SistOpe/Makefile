@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Iinclude
+CXXFLAGS = -Wall -std=c++17 -Iinclude
  
 SRC = $(shell find src -name '*.cpp')
 TARGET = sistope

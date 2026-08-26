@@ -5,8 +5,6 @@
 
 using namespace std;
 
-
-
 int main() {
     loadEnv();
 
@@ -15,9 +13,6 @@ int main() {
 
     vector<Profile> profiles = loadProfiles();
     vector<User> users = loadUsers(profiles);
-
-    
-    
 
     runMainMenu(profiles, users);
 
