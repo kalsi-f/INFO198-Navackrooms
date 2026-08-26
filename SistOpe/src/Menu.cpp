@@ -32,7 +32,7 @@ void dynamicListMenu(vector<Profile>& profiles, vector<User>& users, const strin
         clearBuffer();
         cout << CLEAR_SCREEN_CODE;
 
-        if (0 < option && option < profiles.size()) options[option-1].callback(profiles, users);
+        if (0 < option && option <= options.size()) options[option-1].callback(profiles, users);
         else if (option == 0) break;
         else cout << "Error: Opción inválida" << endl;
 
