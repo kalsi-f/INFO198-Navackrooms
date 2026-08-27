@@ -25,7 +25,7 @@ struct Users {
 Users loadUsers(vector<Profile> &profiles);
  
 // agrega una nueva linea al final de USUARIOS.TXT
-void appendUser(const string& path, const User& u);
+void appendUser(const User& u, const vector<Profile>& profiles);
  
 // reescribe el archivo completo desde cero con la lista actual
 void saveAllUsers(const Users& users, const std::vector<Profile>& profiles);

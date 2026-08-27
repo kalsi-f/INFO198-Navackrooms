@@ -15,9 +15,15 @@ El sistema permite:
   de opciones de menú permitidas (por ejemplo `ADMIN;0,1,2,3,4`).
 
 Toda la información se persiste en archivos de texto plano
-(`USERS.TXT` y `PROFILES.TXT`), y se mantiene además en memoria durante la
+(`USUARIOS.TXT` y `PERFILES.TXT`), y se mantiene además en memoria durante la
 ejecución del programa para no tener que releer el archivo en cada
 operación.
+
+## Notas de uso
+
+- En el menú principal la opción `0` sale del programa; en los submenús vuelve atrás.
+- Los campos no pueden contener `;` porque es el separador de los archivos.
+- Las opciones de un perfil deben ser números no negativos.
 
 ## Cómo ejecutar
 
@@ -42,8 +48,8 @@ El proyecto usa un archivo `.env` en la raíz, con las siguientes variables:
 
 Formato de `.env`:
 ```
-USER_FILE=db/USERS.TXT
-PERFIL_FILE=db/PROFILES.TXT
+USER_FILE=db/USUARIOS.TXT
+PERFIL_FILE=db/PERFILES.TXT
 ```
 
 Estas variables se cargan al entorno real del proceso al iniciar el

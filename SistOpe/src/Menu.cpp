@@ -16,7 +16,7 @@ void clearBuffer() {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
-void dynamicListMenu(vector<Profile>& profiles, Users& users, const string &title, vector<MenuOption> &options) {
+void dynamicListMenu(vector<Profile>& profiles, Users& users, const string &title, vector<MenuOption> &options, const string &exitName = "Retroceder") {
     string input;
     int option = -1;
 
@@ -24,13 +24,15 @@ void dynamicListMenu(vector<Profile>& profiles, Users& users, const string &titl
     
     while (option != 0) {
         cout << "— " << title << " —" << endl;
-        cout << "0. Retroceder" << endl;
+        cout << "0. " << exitName << endl;
         for (size_t i = 0; i < options.size(); i++) {
             cout << i + 1 << ". " << options[i].name << endl; 
         }
 
         cout << "Opcion: ";
-        cin >> input;
+        if (!(cin >> input)) {
+            break; // se corto la entrada (EOF), se sale igual que con 0
+        }
         try {
             option = stoi(input);
         }
@@ -63,7 +65,9 @@ vector<int> parseOptions(const string& text) {
     while (getline(ss, format, ',')) {
         size_t pos;
         int value = stoi(format, &pos);
-        if (value < 0) cerr << "Error: opción ingresada inválida" << endl;
+        if (value < 0) {
+            throw invalid_argument("opcion negativa: " + format);
+        }
         if (pos != format.size()) {
             throw invalid_argument("formato invalido: " + format);
         }
@@ -85,6 +89,11 @@ void createProfileMenu(vector<Profile>& profiles) {
         if (p.name.empty()) {
             cout << "Creacion cancelada." << endl;
             return;
+        }
+
+        if (p.name.find(';') != string::npos) {
+            cout << "Error: el nombre no puede contener ';', es el separador del archivo." << endl;
+            continue;
         }
 
         bool exists = false;
@@ -273,7 +282,15 @@ string askNonEmpty(const string& label) {
     while (true) {
         cout << label << ": ";
         string text;
-        getline(cin, text);
+
+        if (!getline(cin, text)) {
+            return ""; // se corto la entrada (EOF), se cancela el ingreso
+        }
+
+        if (text.find(';') != string::npos) {
+            cout << "Error: no se permite ';', es el separador del archivo." << endl;
+            continue;
+        }
 
         if (!text.empty()) {
             return text;
@@ -385,6 +402,6 @@ void runMainMenu(vector<Profile>& profiles, Users& users) {
         {"Gestion de Perfiles", runProfileMenu}
     };
 
-    dynamicListMenu(profiles, users, "Menu Principal", options);
+    dynamicListMenu(profiles, users, "Menu Principal", options, "Salir");
     cout << "Finalización del programa exitosa" << endl;
 }
