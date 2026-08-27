@@ -1,7 +1,2 @@
 GENERAL;0,1,3
-<<<<<<< HEAD
 ADMIN;1,2,4,5
-=======
-ADMIN;1,2,4,5
-Seron;0
->>>>>>> minder_ft_fabian
