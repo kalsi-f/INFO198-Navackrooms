@@ -52,7 +52,8 @@ vector<Profile> loadProfiles() {
             try {
                 size_t pos;
                 int value = stoi(option, &pos);
-                if (pos != option.size()) {
+
+                if (pos != option.size() || value < 0) {
                     throw invalid_argument("sobra texto no numerico");
                 }
                 p.options.push_back(value);
