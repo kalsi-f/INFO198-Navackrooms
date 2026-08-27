@@ -27,6 +27,11 @@ operación.
 
 ## Cómo ejecutar
 
+> **Nota:** este proyecto fue diseñado y probado en **Linux**. Por lo que no está
+> garantizado que compile o funcione correctamente en Windows sin un
+> entorno compatible. Se recomienda ejecutar en Linux, macOS, o en Windows
+> a través de **WSL (Windows Subsystem for Linux)**.
+
 ### Compilar y ejecutar
 
 Desde la raíz del proyecto (donde está el `Makefile` y el `.env`):
