@@ -48,7 +48,7 @@ void appendProfile(const Profile& p) {
 
     file << p.name << ";";
 
-    for (int i = 0; i < p.options.size(); i++) {
+    for (size_t i = 0; i < p.options.size(); i++) {
         file << p.options[i];
         if (i < p.options.size() - 1) {
             file << ",";
@@ -61,7 +61,7 @@ void appendProfile(const Profile& p) {
 void saveAllProfiles(const vector<Profile>& profiles) {
     ofstream file(ENV_CONFIG.PROFILES_FILE_PATH); // lo mismo que ios::out, pero este borra todo el contenido previo
 
-    for (int i = 0; i < profiles.size(); i++) {
+    for (size_t i = 0; i < profiles.size(); i++) {
         file << profiles[i].name << ";";
         for (int j = 0; j < profiles[i].options.size(); j++) {
             file << profiles[i].options[j];
@@ -89,7 +89,7 @@ void createProfile(vector<Profile>& profiles, const Profile& p) {
 }
 
 bool deleteProfile(vector<Profile>& profiles, const string& name) {
-    for (int i = 0; i < profiles.size(); i++) {
+    for (size_t i = 0; i < profiles.size(); i++) {
         if (profiles[i].name == name) {
             profiles.erase(profiles.begin() + i);
             saveAllProfiles(profiles);
