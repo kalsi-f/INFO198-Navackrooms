@@ -324,10 +324,19 @@ void listUsersMenu(vector<Profile>& profiles, Users& users) {
 
 // ELIMINAR USUARIO
 void deleteUserMenu(vector<Profile>& profiles, Users& users) {
+    string input;
 
     cout << "Id del usuario a eliminar: ";
-    int id;
-    cin >> id;
+    int id = -1;
+    cin >> input;
+    try {
+        id = stoi(input);
+    }
+    catch (const std::invalid_argument & e) {
+
+    }
+
+
     clearBuffer();
 
     User* target = nullptr;
