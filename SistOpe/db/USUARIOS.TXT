@@ -1,4 +1,9 @@
 
 
 1;Jaime Guzman;mori;123456;ADMIN
+<<<<<<< HEAD
 5;Fabian Reyes;kalsi;11231;GENERAL
+=======
+5;Fabian Reyes;kalsi;45678;GENERAL
+7;juan pardo;pardovich;111;Seron
+>>>>>>> minder_ft_fabian
