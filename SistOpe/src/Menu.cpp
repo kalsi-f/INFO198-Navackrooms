@@ -63,6 +63,7 @@ vector<int> parseOptions(const string& text) {
     while (getline(ss, format, ',')) {
         size_t pos;
         int value = stoi(format, &pos);
+        if (value < 0) cerr << "Error: opción ingresada inválida" << endl;
         if (pos != format.size()) {
             throw invalid_argument("formato invalido: " + format);
         }

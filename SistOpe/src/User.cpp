@@ -74,8 +74,9 @@ Users loadUsers(vector<Profile> &profiles) {
  
         strncpy(u.password, password.c_str(), sizeof(u.password) - 1);
         u.password[sizeof(u.password) - 1] = '\0';
+
+        u.profile_index = -1;
  
-        u.profile = nullptr;
         for (size_t i = 0; i < profiles.size(); i++) {
             if (profiles[i].name == profileText) {
                 u.profile_index = i; // guardando indice
@@ -83,7 +84,7 @@ Users loadUsers(vector<Profile> &profiles) {
             }
         }
  
-        if (u.profile == nullptr) {
+        if (u.profile_index == -1) {
             throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
                                 string(ENV_CONFIG.USERS_FILE_PATH) + 
                                 "' referencia un perfil inexistente ('" + profileText + "'): " + line);
