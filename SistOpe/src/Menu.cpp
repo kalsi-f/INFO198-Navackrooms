@@ -1,3 +1,4 @@
+
 #include "Menu.h"
 
 #include <cstring>
@@ -16,6 +17,7 @@ void clearBuffer() {
 }
 
 void dynamicListMenu(vector<Profile>& profiles, Users& users, const string &title, vector<MenuOption> &options) {
+    string input;
     int option = -1;
 
     cout << CLEAR_SCREEN_CODE;
@@ -28,7 +30,13 @@ void dynamicListMenu(vector<Profile>& profiles, Users& users, const string &titl
         }
 
         cout << "Opcion: ";
-        cin >> option;
+        cin >> input;
+        try {
+            option = stoi(input);
+        }
+        catch (const std::invalid_argument & e) {
+            
+        }
         clearBuffer();
         cout << CLEAR_SCREEN_CODE;
 
@@ -40,7 +48,7 @@ void dynamicListMenu(vector<Profile>& profiles, Users& users, const string &titl
 }
 
 void printProfiles(vector<Profile>& profiles) {
-    for (int i = 0; i < profiles.size(); i++) {
+    for (size_t i = 0; i < profiles.size(); i++) {
         cout << i + 1 << ". " << profiles[i].name << endl;
     }
 }
@@ -55,6 +63,7 @@ vector<int> parseOptions(const string& text) {
     while (getline(ss, format, ',')) {
         size_t pos;
         int value = stoi(format, &pos);
+        if (value < 0) cerr << "Error: opción ingresada inválida" << endl;
         if (pos != format.size()) {
             throw invalid_argument("formato invalido: " + format);
         }
@@ -124,30 +133,77 @@ void listProfilesMenu(vector<Profile>& profiles) {
         cout << endl;
     }
 }
-// ELIMINAR PERFIL
+
+// muestra los perfiles y pide una opcion repitiendo hasta que sea valida.
+// devuelve el puntero elegido, o nullptr si el usuario cancelo dejando vacio.
+int askProfileChoice(vector<Profile>& profiles) {
+    while (true) {
+        cout << "Elija un perfil (vacio para cancelar):" << endl;
+        printProfiles(profiles);
+        cout << "Opcion: ";
+        string text;
+        getline(cin, text);
+
+        if (text.empty()) {
+            return -1;
+        }
+
+        int option;
+        try {
+            size_t pos;
+            option = stoi(text, &pos);
+            if (pos != text.size()) {
+                throw invalid_argument("opcion invalida");
+            }
+        } catch (const invalid_argument&) {
+            cout << "Error: debe ingresar un numero valido." << endl;
+            continue;
+        }
+
+        if (option < 1 || option > (int)profiles.size()) {
+            cout << "Error: opcion invalida. Intente de nuevo." << endl;
+        } else {
+            return option - 1;
+        }
+    }
+}
+
 void deleteProfileMenu(vector<Profile>& profiles, Users& users) {
-    cout << "Nombre del perfil a eliminar: ";
-    string namef;
-    getline(cin, namef);
+    cout << "Seleccione el perfil a eliminar:" << endl;
+    int profile_index_delete = askProfileChoice(profiles);
+    
+    if (profile_index_delete == -1) {
+        cout << "Eliminacion cancelada." << endl;
+        return;
+    }
+    
+    
+    string namef = profiles[profile_index_delete].name; 
+    
+    vector<User*> users_to_update;
 
-    bool hasUsers = false;                                 
-    for (User& u : users.data) {                                 
-        if (u.profile->name == namef) {                      
-            hasUsers = true;                                 
-            break;                                            
-        }                                                     
-    }                                                          
+    for (User& u : users.data) {
+        if (u.profile_index == profile_index_delete) {
+            cout << "Error: ya existen usuarios con este perfil asignado." << endl;
+            return; 
+        }
+        if (u.profile_index > profile_index_delete) {
+            users_to_update.push_back(&u);
+        }
+    } 
 
-    if (hasUsers) {                                            
-        cout << "Error: no es posible eliminar, ya existen usuarios con este perfil asignado." << endl;
-        return;                                                 
-    }                                                           
-
+    
     bool deleted = deleteProfile(profiles, namef);
+
     if (deleted) {
-        cout << "Perfil eliminado." << endl;
+        for (User* target_user : users_to_update) {
+            target_user->profile_index--;
+        }
+        
+        saveAllUsers(users, profiles); 
+        cout << "Perfil eliminado" << endl;
     } else {
-        cout << "Error: no existe un perfil con ese nombre." << endl;
+        cout << "Error: al borrar el perfil." << endl;
     }
 }
 
@@ -212,40 +268,6 @@ bool askNewUserId(Users& users, int& id) {
 }
 */
 
-// muestra los perfiles y pide una opcion repitiendo hasta que sea valida.
-// devuelve el puntero elegido, o nullptr si el usuario cancelo dejando vacio.
-Profile* askProfileChoice(vector<Profile>& profiles) {
-    while (true) {
-        cout << "Elija un perfil (vacio para cancelar):" << endl;
-        printProfiles(profiles);
-        cout << "Opcion: ";
-        string text;
-        getline(cin, text);
-
-        if (text.empty()) {
-            return nullptr;
-        }
-
-        int option;
-        try {
-            size_t pos;
-            option = stoi(text, &pos);
-            if (pos != text.size()) {
-                throw invalid_argument("opcion invalida");
-            }
-        } catch (const invalid_argument&) {
-            cout << "Error: debe ingresar un numero valido." << endl;
-            continue;
-        }
-
-        if (option < 1 || option > (int)profiles.size()) {
-            cout << "Error: opcion invalida. Intente de nuevo." << endl;
-        } else {
-            return &profiles[option - 1];
-        }
-    }
-}
-
 // pide una linea de texto, repitiendo hasta que no quede vacia
 string askNonEmpty(const string& label) {
     while (true) {
@@ -279,16 +301,16 @@ void createUserMenu(vector<Profile>& profiles, Users& users) {
     strncpy(u.password, password.c_str(), sizeof(u.password) - 1);
     u.password[sizeof(u.password) - 1] = '\0';
 
-    Profile* chosen = askProfileChoice(profiles);
-    if (chosen == nullptr) {
+    int chosen = askProfileChoice(profiles);
+    if (chosen == -1) {
         cout << "Creacion cancelada." << endl;
         return;
     }
-    u.profile = chosen;
+    u.profile_index = chosen;
 
     createUser(profiles, users, u);
 
-    users.currentId++;
+    //users.currentId++; esto se hace em createUSER.
 
     cout << "Usuario creado." << endl;
 }
@@ -296,7 +318,7 @@ void createUserMenu(vector<Profile>& profiles, Users& users) {
 // LISTAR USUARIO 
 void listUsersMenu(vector<Profile>& profiles, Users& users) {
     for (User& u : users.data) {
-        cout << u.id << " - " << u.name << " (" << u.username << ") perfil=" << u.profile->name << endl;
+        cout << u.id << " - " << u.name << " (" << u.username << ") perfil=" << profiles[u.profile_index].name << endl;
     }
 }
 
@@ -321,7 +343,7 @@ void deleteUserMenu(vector<Profile>& profiles, Users& users) {
         return;
     }
 
-    if (target->profile->name == "ADMIN") {
+    if (profiles[target->profile_index].name == "ADMIN") {
         cout << "Alerta: estas eliminando un usuario ADMIN. Deseas continuar? (s/n): ";
         string confirm;
         getline(cin, confirm);

@@ -1,4 +1,2 @@
-
-
 1;Jaime Guzman;mori;123456;ADMIN
 5;Fabian Reyes;kalsi;11231;GENERAL

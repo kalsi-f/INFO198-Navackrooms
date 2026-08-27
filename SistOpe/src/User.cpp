@@ -74,16 +74,17 @@ Users loadUsers(vector<Profile> &profiles) {
  
         strncpy(u.password, password.c_str(), sizeof(u.password) - 1);
         u.password[sizeof(u.password) - 1] = '\0';
+
+        u.profile_index = -1;
  
-        u.profile = nullptr;
-        for (int i = 0; i < profiles.size(); i++) {
+        for (size_t i = 0; i < profiles.size(); i++) {
             if (profiles[i].name == profileText) {
-                u.profile = &profiles[i];
+                u.profile_index = i; // guardando indice
                 break;
             }
         }
  
-        if (u.profile == nullptr) {
+        if (u.profile_index == -1) {
             throw runtime_error("Error: linea " + to_string(lineNumber) + " de '" + 
                                 string(ENV_CONFIG.USERS_FILE_PATH) + 
                                 "' referencia un perfil inexistente ('" + profileText + "'): " + line);
@@ -94,13 +95,8 @@ Users loadUsers(vector<Profile> &profiles) {
  
     return users;
 }
-
-    
-
-
-
-
-void appendUser(const User& u) {
+ 
+void appendUser(const User& u, const vector<Profile>& profiles) {
     ofstream file(ENV_CONFIG.USERS_FILE_PATH, ios::app);
  
     if (!file.is_open()) {
@@ -111,15 +107,15 @@ void appendUser(const User& u) {
          << u.name << ";"
          << u.username << ";"
          << u.password << ";"
-         << u.profile->name << endl;
+         << profiles[u.profile_index].name << endl; //accede al nombre mediante el index
 }
  
-void saveAllUsers(const Users& users) {
+void saveAllUsers(const Users& users, const vector<Profile>& profiles) {
     ofstream file(ENV_CONFIG.USERS_FILE_PATH); // sin ios::append => reescribe desde cero
  
-    for (int i = 0; i < users.data.size(); i++) {
+    for (size_t i = 0; i < users.data.size(); i++) {
         file << users.data[i].id << ";" << users.data[i].name << ";" << users.data[i].username << ";"
-             << users.data[i].password << ";" << users.data[i].profile->name << endl;
+             << users.data[i].password << ";" << profiles[users.data[i].profile_index].name << endl;
     }
 }
  
@@ -133,18 +129,24 @@ vector<User>& listUsers(vector<User>& users, bool& loaded, const string& path, v
 }
 */    
  
-void createUser(vector<Profile>& profiles, Users& users, const User& u) {
+void createUser(vector<Profile>& profiles, Users& users, User& u) {
     // listUsers(users, loaded, path, profiles); // asegura que este cargado antes de agregar
+    //users.data.push_back(u);
+    //appendUser(u);
+
+    //logica nueva 
+    users.currentId ++; // para no chocar con los ides
+    u.id =  users.currentId;
     users.data.push_back(u);
-    appendUser(u);
+    appendUser(u, profiles);
 }
  
 bool deleteUser(vector<Profile>& profiles, Users& users, int id) {
  
-    for (int i = 0; i < users.data.size(); i++) {
+    for (size_t i = 0; i < users.data.size(); i++) {
         if (users.data[i].id == id) {
             users.data.erase(users.data.begin() + i);
-            saveAllUsers(users);
+            saveAllUsers(users, profiles);
             return true;
         }
     }
