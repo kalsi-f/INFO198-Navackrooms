@@ -19,6 +19,7 @@ Toda la información se persiste en archivos de texto plano
 ejecución del programa para no tener que releer el archivo en cada
 operación.
 
+
 ## Notas de uso
 
 - En el menú principal la opción `0` sale del programa; en los submenús vuelve atrás.
@@ -62,3 +63,12 @@ programa (`loadEnv()`), y se leen desde cualquier parte del código con
 `getEnvVar("USER_FILE")` / `getEnvVar("PERFIL_FILE")`.
 
 
+## Decisiones tomadas
+se modificó la persistencia de usuarios y perfiles para
+leer y escribir el struct completo directamente mediante archivos binarios,
+siguiendo la logica presentada en el ejemplo de referencia del
+entregable. 
+se cambiaron funciones porque antes habia que trabajar con el formato de texto ahora es màs directo
+Tambien se creo el ejecutable para adminusuarios y sea llamado de esa forma
+
+Falta hacer el resto de funciones y sus necesidades

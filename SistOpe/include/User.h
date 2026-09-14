@@ -5,13 +5,17 @@
 #include <vector>
 #include "Profile.h"
 using namespace std;
+
+const int MAX_NAME = 50;
+const int MAX_USERNAME = 20;
+const int MAX_PASSWORD = 20;
  
 struct User {
     int id;
-    char name[50];
-    char username[20];
-    char password[20];
-    int profile_index;   // ya no Profile* profile;
+    char name[MAX_NAME];
+    char username[MAX_USERNAME];
+    char password[MAX_PASSWORD];
+    int profileIndex;   
 };
  
 struct Users {
@@ -22,7 +26,7 @@ struct Users {
 // persistencia
 // lee USUARIOS.TXT y devuelve la lista de usuarios cargados,
 // con el puntero "profile" de cada uno por nombre
-Users loadUsers(vector<Profile> &profiles);
+Users loadUsers(const vector<Profile> &profiles);
  
 // agrega una nueva linea al final de USUARIOS.TXT
 void appendUser(const User& u, const vector<Profile>& profiles);
@@ -41,5 +45,9 @@ void createUser(vector<Profile>& profiles, Users& users, User& u);
 // pero igual lo elimina (solo advierte, no bloquea)
 bool deleteUser(vector<Profile>& profiles, Users& users, int id);
  
+// busca nuevamente al usuario por ID. puntero puede quedar invalido
+// si cambia el vector de los usuarios
+User* findUserById(Users& users, int id);
+
 #endif
  
