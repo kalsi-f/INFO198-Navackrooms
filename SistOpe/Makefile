@@ -1,25 +1,31 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++17 -Iinclude
 
-COMMON_SRC = src/Auth.cpp src/Profile.cpp src/User.cpp src/config/EnvConfig.cpp
-MAIN_SRC = src/main.cpp src/Menu.cpp src/AdminMenu.cpp
-ADMIN_SRC = src/admin_main.cpp src/AdminMenu.cpp src/Menu.cpp
-COUNT_SRC = src/count_main.cpp src/CountSystem.cpp
+LIB = $(shell find lib -name '*.cpp')
+MAIN_SRC = src/main.cpp
+ADMIN_SRC = src/util/admin.cpp
+COUNT_SRC = src/util/count.cpp
 
-TARGET = sistope
-ADMIN_TARGET = adminUsuariosPerfiles
-COUNT_TARGET = Count
+TARGET = target/sistope
+ADMIN_TARGET = target/util/admin
+COUNT_TARGET = target/util/count
 
-all: $(TARGET) $(ADMIN_TARGET) $(COUNT_TARGET)
+
+all: compile
+
+mkdir:
+	mkdir -p target/util 
+
+compile: $(TARGET) $(ADMIN_TARGET) $(COUNT_TARGET)
 
 $(TARGET):
-	$(CXX) $(CXXFLAGS) $(MAIN_SRC) $(COMMON_SRC) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(MAIN_SRC) $(LIB) -o $(TARGET)
 
 $(ADMIN_TARGET):
-	$(CXX) $(CXXFLAGS) $(ADMIN_SRC) $(COMMON_SRC) -o $(ADMIN_TARGET)
+	$(CXX) $(CXXFLAGS) $(ADMIN_SRC) $(LIB) -o $(ADMIN_TARGET)
 
 $(COUNT_TARGET):
-	$(CXX) $(CXXFLAGS) $(COUNT_SRC) -o $(COUNT_TARGET)
+	$(CXX) $(CXXFLAGS) $(COUNT_SRC) $(LIB) -o $(COUNT_TARGET)
 
 run: all
 	./$(TARGET)
