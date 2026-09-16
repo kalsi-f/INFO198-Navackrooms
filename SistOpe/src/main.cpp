@@ -35,14 +35,13 @@ int main(int argc, char* argv[]) {
         );
 
     if (loggedUserId == -1) {
-
         cerr << "Error: credenciales invalidas."
              << endl;
 
         return 1;
     }
 
-    runMainMenu(
+    mainMenu(
         profiles,
         users,
         loggedUserId,

@@ -22,6 +22,6 @@ void adminUsersProfilesSystemMenu(vector<Profile>& profiles,Users& users,int log
 void dynamicListMenu(vector<Profile>& profiles,Users& users,int loggedUserId,const string& filePath,
                     const string& title,vector<MenuOption>& options,const string& exitName = "Retroceder");
 
-void runMainMenu(vector<Profile>& profiles,Users& users,int loggedUserId,const string& filePath);
+void mainMenu(vector<Profile>& profiles,Users& users,int loggedUserId,const string& filePath);
 
 #endif

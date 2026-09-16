@@ -164,11 +164,9 @@ vector<MenuOption> buildMainMenuOptions(vector<Profile>& profiles, User* loggedU
 
     Profile& userProfile = profiles[loggedUser->profileIndex];
 
-    bool isAdmin =
-        strcmp(userProfile.name, "ADMIN") == 0;
+    bool isAdmin = strcmp(userProfile.name, "ADMIN") == 0;
 
     for (const MenuOption& option : allOptions) {
-
         if (option.id == 1 && isAdmin) {
             allowed.push_back(option);
             continue;
@@ -181,9 +179,7 @@ vector<MenuOption> buildMainMenuOptions(vector<Profile>& profiles, User* loggedU
 
         bool permitted = false;
 
-        for (int i = 0;
-             i < userProfile.optionsCount;
-             i++) {
+        for (int i = 0; i < userProfile.optionsCount; i++) {
 
             if (userProfile.options[i] == option.id) {
                 permitted = true;
@@ -199,7 +195,7 @@ vector<MenuOption> buildMainMenuOptions(vector<Profile>& profiles, User* loggedU
     return allowed;
 }
 
-void runMainMenu(vector<Profile>& profiles,Users& users,int loggedUserId,const string& filePath) {
+void mainMenu(vector<Profile>& profiles, Users& users , int loggedUserId , const string& filePath) {
     User* loggedUser = findUserById(users, loggedUserId);
     if (loggedUser == nullptr) {
         cout << "Error: no se encontro el usuario autenticado." << endl;

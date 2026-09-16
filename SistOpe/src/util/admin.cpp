@@ -27,11 +27,8 @@ int main() {
         return 1;
     }
 
-    vector<Profile> profiles =
-        loadProfiles();
-
-    Users users =
-        loadUsers(profiles);
+    vector<Profile> profiles = loadProfiles();
+    Users users = loadUsers(profiles);
 
     User* loggedUser = nullptr;
 
