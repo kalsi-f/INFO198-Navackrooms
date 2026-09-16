@@ -1,0 +1,1 @@
+Este archivo se utiliza para probar el conteo de texto.

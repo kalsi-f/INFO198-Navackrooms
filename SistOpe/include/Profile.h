@@ -5,9 +5,13 @@
 #include <vector>
 using namespace std;
 
+const int MAX_PROFILE_NAME = 20;   
+const int MAX_OPTIONS = 8;   
+
 struct Profile {
-    string name;          // ej: "ADMIN", "GENERAL"
-    vector<int> options;   // opciones de menu permitidas
+    char name[MAX_PROFILE_NAME];          // ej: "ADMIN", "GENERAL"
+    int options[MAX_OPTIONS];   // opciones de menu permitidas
+    int optionsCount;           // cantidad de opciones de menu permitidas
 };
  
 // persistencia 

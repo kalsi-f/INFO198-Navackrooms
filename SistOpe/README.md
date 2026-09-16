@@ -19,6 +19,7 @@ Toda la información se persiste en archivos de texto plano
 ejecución del programa para no tener que releer el archivo en cada
 operación.
 
+
 ## Notas de uso
 
 - En el menú principal la opción `0` sale del programa; en los submenús vuelve atrás.
@@ -61,4 +62,23 @@ Estas variables se cargan al entorno real del proceso al iniciar el
 programa (`loadEnv()`), y se leen desde cualquier parte del código con
 `getEnvVar("USER_FILE")` / `getEnvVar("PERFIL_FILE")`.
 
+## LIBROS
+Todos los libros que se utilizan fueron obtenidos a traves de https://www.gutenberg.org/
 
+## (esto lo podemos sacar despues)
+## Decisiones tomadas
+se modificó la persistencia de usuarios y perfiles para
+leer y escribir el struct completo directamente mediante archivos binarios,
+siguiendo la logica presentada en el ejemplo de referencia del
+entregable. 
+se cambiaron funciones porque antes habia que trabajar con el formato de texto ahora es màs directo
+Tambien se creo el ejecutable para adminusuarios y sea llamado de esa forma
+
+Falta hacer lo de matrices, y  
+(4) ¿es palíndromo?, debe abrir una interfaz para escribir un texto, y contener dos
+opciones
+(1) Validar (la cual debe validar si el texto ingresado es o no palíndromo),
+(2) cancelar
+
+(5) Calcular f(x)=x*x + 2x + 8, debe abrir una interfaz que permita indicar X y entregue la
+especificac
