@@ -56,6 +56,19 @@ int get_option() {
     return option;
 }
 
+int simple_menu(vector<string> options) {
+    for (size_t i = 0; i < options.size(); i++) {
+        cout << i << ". " << options[i] << endl;
+    }
+
+    int option = get_option();
+
+    if (option < 0 || option >= static_cast<int>(options.size())) 
+        display_error("Opcion invalida.");
+
+    return option;
+ }
+
 void program_menu(
     vector<Profile>&profiles, 
     Users& users, 
@@ -63,7 +76,6 @@ void program_menu(
     const string& title, vector<ProgramOption> programs, 
     const string& exitName
 ) {
-    string input;
     int option = -1;
 
     while (option != 0) {
@@ -79,10 +91,7 @@ void program_menu(
         }
 
         option = get_option();
-        if (option == 0) {
-            clear_screen();   
-            break;
-        }
+        if (option == 0) break;
 
         if (option < 0 || option > static_cast<int>(programs.size())) {
             display_error("Opcion invalida.");
@@ -130,10 +139,7 @@ void dynamicListMenu(
         }
 
         option = get_option();
-        if (option == 0) {
-            clear_screen();
-            break;
-        }
+        if (option == 0) break;
 
         bool found = false;
         for (MenuOption& menuOption : options) {

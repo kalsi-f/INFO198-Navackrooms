@@ -22,6 +22,8 @@ struct MenuOption {
 
 void clear_screen();
 
+int simple_menu(vector<string> options);
+
 void program_menu(
     vector<Profile>& profiles, 
     Users& users, 
