@@ -27,14 +27,14 @@ int main(int argc, char* argv[]) {
         loadUsers(profiles);
 
     // autenticar usuario
-    int loggedUserId =
+    int userId =
         authenticateUser(
             users,
             args.username,
             args.password
         );
 
-    if (loggedUserId == -1) {
+    if (userId == -1) {
 
         cerr << "Error: credenciales invalidas."
              << endl;
@@ -42,10 +42,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    runMainMenu(
+    main_menu(
         profiles,
         users,
-        loggedUserId,
+        userId,
         args.filePath
     );
 

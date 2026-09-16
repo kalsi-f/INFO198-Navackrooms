@@ -81,3 +81,17 @@ int authenticateUser(const Users& users, const string& username, const string& p
 
     return -1;
 }
+
+bool isUserAllowed(vector<Profile>& profiles, Users& users, int userId, int optionId) {
+    // Determina si el usuario puede acceder a la opcion de menu
+    User* user = findUserById(users, userId);
+    if (user == nullptr) return false;
+    
+    Profile userProfile = profiles[user->profileIndex];
+
+    for (int i = 0; i < userProfile.optionsCount; i++) {
+        if (userProfile.options[i] == optionId) return true;
+    }
+
+    return false;
+}

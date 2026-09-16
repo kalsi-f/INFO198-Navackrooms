@@ -18,4 +18,6 @@ RunArgs parseArguments(int argc, char* argv[]);
 // devuelve el ID del usuario autenticado o -1 si las credenciales no coinciden
 int authenticateUser(const Users& users, const string& username, const string& password);
  
+// Determina si el usuario puede acceder a la opcion de menu
+bool isUserAllowed(vector<Profile>& profiles, Users& users, int userId, int optionId);
 #endif

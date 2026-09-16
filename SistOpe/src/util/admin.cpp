@@ -1,6 +1,7 @@
 #include "config/EnvConfig.h"
 #include "Profile.h"
 #include "User.h"
+#include "Auth.h"
 #include "AdminMenu.h"
 
 #include <cstdlib>
@@ -11,7 +12,7 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
     loadEnv();
 
     ENV_CONFIG.PROFILES_FILE_PATH =
@@ -20,7 +21,13 @@ int main() {
     ENV_CONFIG.USERS_FILE_PATH =
         getEnvVar("USER_FILE");
 
-    const char* username = getenv("ADMIN_USERNAME");
+    if (argc != 2) {
+        cerr << "Error: Número de argumentos invalido" << endl;
+        cout << "Uso: " << argv[0] << " <USUARIO>" << endl;
+        return 1;
+    }
+
+    const char* username = argv[1];
 
     if (username == nullptr) {
         cerr << "Error: usuario administrador no especificado." << endl;
@@ -38,14 +45,6 @@ int main() {
             loggedUser = &user;
             break;
         }
-    }
-
-    if (loggedUser == nullptr ||
-        loggedUser->profileIndex < 0 ||
-        loggedUser->profileIndex >= static_cast<int>(profiles.size()) ||
-        strcmp(profiles[loggedUser->profileIndex].name, "ADMIN") != 0) {
-        cerr << "Error: solo el perfil ADMIN puede acceder a esta opcion." << endl;
-        return 1;
     }
 
     adminUsersProfilesMenu(
