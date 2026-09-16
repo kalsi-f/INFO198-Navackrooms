@@ -44,8 +44,6 @@ int get_option() {
 
     if (!getline(cin, input)) option = -1;
 
-    if (input.empty()) display_error("debe seleccionar una opcion.");
-
     try {
         size_t pos;
         option = stoi(input, &pos);
@@ -86,7 +84,7 @@ void program_menu(
             break;
         }
 
-        if (option < 0 || option >= static_cast<int>(programs.size())) {
+        if (option < 0 || option > static_cast<int>(programs.size())) {
             display_error("Opcion invalida.");
             continue;
         }
@@ -96,18 +94,16 @@ void program_menu(
             // La opcion empieza del indice 1 y el vector comienza desde el indice 0 por lo que hay que restarle 1 a la opcion
             ProgramOption programOption = programs[option-1];
             string command = programOption.path;
-            cout << "cmd: " << command << endl;
 
             for (string& arg: programOption.args)
                 command += " " + arg;
 
-            cout << "f: " << command << endl;
 
             if (system(command.c_str()) != 0) 
                 display_error("El programa finalizo incorrectamente.");
         }
         else 
-            display_error("Acceso denegado. Permisos insuficientes");
+            display_error("Acceso denegado. Permisos insuficientes.");
 
     }
 }
