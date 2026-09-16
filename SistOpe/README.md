@@ -65,7 +65,7 @@ programa (`loadEnv()`), y se leen desde cualquier parte del código con
 ## LIBROS
 Todos los libros que se utilizan fueron obtenidos a traves de https://www.gutenberg.org/
 
-## (esto lo podemos sacar despues)
+## (esto lo sacamos despues, es para que vean que falta nomas, lo de los libros se queda)
 ## Decisiones tomadas
 se modificó la persistencia de usuarios y perfiles para
 leer y escribir el struct completo directamente mediante archivos binarios,
