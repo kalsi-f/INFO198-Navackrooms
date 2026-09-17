@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-bool is_palindrome(string s) {
+bool isPalindrome(string s) {
     for (size_t i = 0; i < s.size()/2; i++) {
         if (s[i] != s[s.size()-i-1]) return false;
     }
@@ -10,25 +10,25 @@ bool is_palindrome(string s) {
 }
 
 int main() {
-    clear_screen();
+    clearScreen();
 
     int option = -1;
     string input;
-    std::vector<string> options = {
+    vector<string> options = {
         "Validar",
         "Cancelar"
     };
 
     while (option != 1) {
-        std::cout << "Ingrese texto a verificar que es palindrome: ";
-        getline(std::cin, input);
+        cout << "Ingrese texto a verificar que es palindrome: ";
+        getline(cin, input);
 
         option = simple_menu(options);
 
         if (option == 0) {
-            if (is_palindrome(input)) std::cout << "Es";
-            else std::cout << "No es";
-            std::cout << " palindrome." << std::endl;
+            if (isPalindrome(input)) cout << "Es";
+            else cout << "No es";
+            cout << " palindrome." << endl;
         }
     }
 

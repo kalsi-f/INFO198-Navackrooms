@@ -1,8 +1,10 @@
 #include <iostream>
 
+using namespace std;
+
 int main() {
-    std::cout << "Programa en construcción" << std::endl;
-    std::cout << "Presione ENTER para continuar...";
-    std::cin.get();
+    cout << "Programa en construcción" << endl;
+    cout << "Presione ENTER para continuar...";
+    cin.get();
     return 0;
 }
