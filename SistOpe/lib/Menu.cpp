@@ -155,16 +155,13 @@ void dynamicListMenu(
     }
 }
 
-void countSystemMenu(vector<Profile>&, Users&, int, const string& filePath, int mode) {
+void countSystemMenu(vector<Profile>&,Users&,int,const string& filePath,int mode) {
+    string command = getEnvVar("COUNT_PROGRAM");
+
     if (mode == 6) {
-        setenv("COUNT_MODE", "6", 1);
-        setenv("COUNT_FILE", filePath.c_str(), 1);
-    } else {
-        setenv("COUNT_MODE", "7", 1);
-        unsetenv("COUNT_FILE");
+        command += " \"" + filePath + "\"";
     }
 
-    string command = getEnvVar("COUNT_PROGRAM");
     int returnCode = system(command.c_str());
 
     if (returnCode != 0) {

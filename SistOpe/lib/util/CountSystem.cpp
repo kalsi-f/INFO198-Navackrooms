@@ -144,18 +144,20 @@ string readTextFile(const string& path) {
     return text;
 }
 
-void runCountSystem(int mode, const string& defaultFilePath) {
+void runCountSystem(const string& FilePath) {
+
     int option = -1;
-
     while (option != 0) {
-        clearScreen();
 
+        clearScreen();
         cout << "========================================" << endl;
-        if (mode == 6) {
+
+        if (!FilePath.empty()) {
             cout << " CONTEO SOBRE TEXTO" << endl;
         } else {
             cout << " CONTEO SOBRE ARCHIVO" << endl;
         }
+
         cout << "========================================" << endl;
         cout << "0. Volver" << endl;
         cout << "1. Realizar conteo" << endl;
@@ -165,7 +167,6 @@ void runCountSystem(int mode, const string& defaultFilePath) {
         if (!getline(cin, input)) {
             return;
         }
-
         try {
             size_t pos;
             option = stoi(input, &pos);
@@ -178,26 +179,22 @@ void runCountSystem(int mode, const string& defaultFilePath) {
             cin.get();
             continue;
         }
-
         if (option == 0) {
             return;
         }
-
         if (option != 1) {
             cout << "Error: opcion invalida." << endl;
             cout << "Presione ENTER para continuar...";
             cin.get();
             continue;
         }
-
         string path;
 
-        if (mode == 6) {
-            path = defaultFilePath;
-
+        if (!FilePath.empty()) {
+            path = FilePath;
             cout << endl;
             cout << "Archivo indicado por -f: " << path << endl;
-        } else if (mode == 7) {
+        } else {
             cout << endl << "Ingrese el path del archivo: ";
             if (!getline(cin, path) || path.empty()) {
                 cout << "Error: el path no puede estar vacio." << endl;
@@ -205,8 +202,7 @@ void runCountSystem(int mode, const string& defaultFilePath) {
                 cin.get();
                 continue;
             }
-        } 
-
+        }
         try {
             string text = readTextFile(path);
             CountResult result = countText(text);
@@ -214,7 +210,6 @@ void runCountSystem(int mode, const string& defaultFilePath) {
         } catch (const exception& e) {
             cout << endl << "Error de conteo: " << e.what() << endl;
         }
-
         cout << "Presione ENTER para continuar...";
         cin.get();
     }

@@ -18,6 +18,6 @@ CountResult countText(const string& text);
 string readTextFile(const string& path);
 
 // para diferenciar entre 6 y 7
-void runCountSystem(int mode, const string& defaultFilePath);
+void runCountSystem(const string& FilePath);
 
 #endif
