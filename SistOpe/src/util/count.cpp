@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
             filePath = argv[1];
             break;
         default:
-            cerr << "Error: Número de argumentos invalido" << endl;
+            cerr << "Error: Numero de argumentos invalido." << endl;
             cout << "Uso: " << endl; 
             cout << "   " << argv[0] << endl;
             cout << "   " <<  argv[0] << " <RUTA_ARCHIVO_TEXTO>" << endl;

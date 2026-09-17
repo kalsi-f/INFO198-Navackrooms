@@ -20,7 +20,7 @@ struct MenuOption {
     void (*callback)(vector<Profile>& profiles, Users& users,int loggedUserId, const string& filePath);
 };
 
-void clear_screen();
+void clearScreen();
 
 void display_error(const string& error);
 

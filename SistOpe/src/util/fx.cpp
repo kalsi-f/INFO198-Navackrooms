@@ -7,19 +7,19 @@ int f(int x){
 }
 
 int main() {
-    clear_screen();
+    clearScreen();
     
     int option = -1;
     int x;
     string input;
-    std::vector<string> options = {
+    vector<string> options = {
         "Calcular otro numero",
         "Volver"
     };
 
     while (option != 1) {
-        std::cout << "Ingrese número entero x = ";
-        getline(std::cin, input);
+        cout << "Ingrese número entero x = ";
+        getline(cin, input);
         
         try {
             x = stoi(input);
@@ -29,11 +29,11 @@ int main() {
             continue;
         }
 
-        std::cout << "f(" << x << ") = " << f(x) << endl;
+        cout << "f(" << x << ") = " << f(x) << endl;
 
         option = simple_menu(options);
         
-        if (option == 0) clear_screen();
+        if (option == 0) clearScreen();
     }
 
     return 0;

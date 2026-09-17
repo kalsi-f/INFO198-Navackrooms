@@ -32,7 +32,7 @@ Users loadUsers(const vector<Profile> &profiles);
 void appendUser(const User& u, const vector<Profile>& profiles);
  
 // reescribe el archivo completo desde cero con la lista actual
-void saveAllUsers(const Users& users, const std::vector<Profile>& profiles);
+void saveAllUsers(const Users& users, const vector<Profile>& profiles);
  
 // si "loaded" es false, carga desde archivo y lo marca como true.
 // si ya es true, devuelve directamente la lista que ya esta en memoria.
