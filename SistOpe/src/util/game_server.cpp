@@ -286,7 +286,7 @@ void acceptPlayer(GameState& game) {
     game.players.push_back({clientSocket, game.nextPlayerId++, "", -1, "", false});
     GamePlayer& player = game.players.back();
     logEvent(game, "ID=" + to_string(player.id), -1, "CONEXION", "Socket aceptado");
-    sendMessage(player, "NOMBRE Ingresa un nombre unico (letras ASCII, numeros o _; maximo 20).");
+    sendMessage(player, "NOMBRE Ingresa un nombre unico (letras, numeros o _; maximo 20).");
 }
 
 // ciclo principal del servidor
