@@ -33,7 +33,7 @@ La opción `0` permite volver o salir de los menús.
 ### Multiplicación de matrices NxM 
 - Recibe dos archivos de texto con matrices (A y B) y un separador, valida que las dimensiones permitan la multiplicación y muestra el resultado.
 ### Juego 
-- Opción reservada, actualmente "en construcción" (sin funcionalidad definida aún).
+- Carrera multiplayer por equipos mediante sockets TCP. La opción 3 abre un menú para iniciar el servidor o un cliente. Ver las reglas e instrucciones del problema 2 al final de este documento.
 ### ¿Es palíndromo? 
 - Abre una interfaz donde se ingresa un texto y se ofrecen dos acciones: Validar (comprueba si el texto es palíndromo) o Cancelar (vuelve al menú).
 ### Calcular f(x) 
@@ -83,6 +83,18 @@ El proyecto usa un archivo `.env` en la raíz, con las siguientes variables:
 | `PALINDROME_PROGRAM` | Ruta al ejecutable que permite trabajar con la funcionalidad de palíndromos |
 | `FX_PROGRAM`   | Ruta al ejecutable que realiza el cálculo de la función \(f(x)=x^2+2x+8\) |
 | `COUNT_PROGRAM` | Ruta al ejecutable encargado de realizar los conteos sobre textos y archivos. |
+| `GAME_PROGRAM` | Menú del juego usado por el sistema |
+| `GAME_SERVER_PROGRAM` | Ejecutable del servidor|
+| `GAME_CLIENT_PROGRAM` | Ejecutable del cliente|
+| `GAME_LOG_FILE` | Ruta al archivo donde se guardan los logs |
+| `GAME_PORT` | `5000` | Puerto TCP entero |
+| `GAME_MIN_TEAMS` |  Mínimo de equipos para iniciar, entre 2 y 16 |
+| `GAME_MAX_TEAMS` |  Máximo de equipos, entre el mínimo y 16 |
+| `GAME_MIN_PER_TEAM` |  Mínimo por equipo, entre 1 y 32 |
+| `GAME_MAX_PER_TEAM` |  Máximo por equipo, entre el mínimo y 32 |
+| `GAME_BOARD_GOAL` |  Meta entera entre 1 y 1000000 |
+| `GAME_DICE_FACES` | Caras del dado, entre 1 y 1000 |
+
 Formato de `.env`:
 ```
 USER_FILE=db/USUARIOS.TXT
@@ -93,7 +105,35 @@ GAME_PROGRAM=target/util/game
 PALINDROME_PROGRAM=target/util/palindrome
 FX_PROGRAM=target/util/fx
 COUNT_PROGRAM=target/util/count
+GAME_SERVER_PROGRAM=target/util/game_server
+GAME_CLIENT_PROGRAM=target/util/game_client
+GAME_LOG_FILE=db/game.log
+GAME_PORT=5000
+GAME_MIN_TEAMS=2
+GAME_MAX_TEAMS=4
+GAME_MIN_PER_TEAM=2
+GAME_MAX_PER_TEAM=4
+GAME_BOARD_GOAL=30
+GAME_DICE_FACES=6
 ```
 ## LIBROS
 Todos los libros que se utilizan fueron obtenidos a traves de https://www.gutenberg.org/
 50 Mb de libros en formato .txt fueron guardados en la carpeta LIBROS dentro de db.
+
+
+
+### Comandos del juego
+
+
+| Comando | Uso |
+|---|---|
+| `/iniciar` | Comenzar si se cumplen los límites de equipos y jugadores |
+| `/lanzar` | Tirar el dado, únicamente durante el turno propio |
+| `/estado` | Consultar equipos, posiciones, meta y turno/espera |
+| `/ayuda` | Mostrar comandos |
+| `/salir` | Desconectarse |
+
+
+
+
+
