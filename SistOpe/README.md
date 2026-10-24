@@ -11,12 +11,12 @@ A partir de esta entrega, el sistema:
 
 - Persiste la información de usuarios y perfiles en formato **binario** , en lugar del formato de texto delimitado por `;` usado en la Entrega 1.
 - Se autentica al arrancar mediante argumentos de ejecución (`-u`, `-p`, `-f`).
-- Presenta un menú dinámico de 7 opciones donde el acceso a cada opción depende del perfil del usuario autenticado (la opción 1 es exclusiva del perfil `ADMIN`).
+- Presenta un menú dinámico de 8 opciones donde el acceso a cada opción depende del perfil del usuario autenticado (las opciones 1 y 8 son exclusivas del perfil `ADMIN`).
 - Reutiliza el módulo de Administración de Usuarios y Perfiles construido en la Entrega 1.
 
 ## Funcionalidades
 
-El menú principal cuenta con siete opciones:
+El menú principal cuenta con ocho opciones:
 
 1. Administración de usuarios y perfiles
 2. Multiplicación de matrices NxM
@@ -25,6 +25,7 @@ El menú principal cuenta con siete opciones:
 5. Calcular f(x)
 6. Conteo sobre texto
 7. Conteo sobre archivo
+8. Crear índice invertido
 
 La opción `0` permite volver o salir de los menús.
 
@@ -42,6 +43,8 @@ La opción `0` permite volver o salir de los menús.
 - Toma el archivo indicado en el argumento -f al ejecutar el programa y entrega un resumen: cantidad de vocales, consonantes, caracteres especiales y palabras; incluye opción Volver.
 ### Conteo sobre archivo 
 - Igual al conteo anterior, pero permite ingresar manualmente la ruta de cualquier archivo a analizar (no depende del -f inicial).
+### Crear índice invertido
+- Construye en paralelo, con una cola de trabajo, threads y semáforos, un índice con las palabras de todos los libros y cuántas veces aparece cada una en cada libro. Solo accesible para el perfil ADMIN. Ver la sección "Índice invertido" más abajo.
 
 
 
@@ -94,6 +97,11 @@ El proyecto usa un archivo `.env` en la raíz, con las siguientes variables:
 | `GAME_MAX_PER_TEAM` |  Máximo por equipo, entre el mínimo y 32 |
 | `GAME_BOARD_GOAL` |  Meta entera entre 1 y 1000000 |
 | `GAME_DICE_FACES` | Caras del dado, entre 1 y 1000 |
+| `INVERTED_INDEX_PROGRAM` | Ruta al ejecutable que crea el índice invertido (opción 8) |
+| `INVERTED_INDEX_FILE` | Ruta del archivo donde se guarda el índice invertido |
+| `BOOK_MAP_FILE` | Ruta del archivo con la asociación `id;nombre` de cada libro |
+| `BOOKS_DIR` | Carpeta con los libros a procesar |
+| `N_THREADS` | Cantidad de threads trabajadores, entero entre 1 y 64 |
 
 Formato de `.env`:
 ```
@@ -115,7 +123,77 @@ GAME_MIN_PER_TEAM=2
 GAME_MAX_PER_TEAM=4
 GAME_BOARD_GOAL=30
 GAME_DICE_FACES=6
+INVERTED_INDEX_PROGRAM=target/util/inverted_index
+INVERTED_INDEX_FILE=db/indice_invertido.idx
+BOOK_MAP_FILE=db/libros.map
+BOOKS_DIR=db/LIBROS
+N_THREADS=4
 ```
+
+## Índice invertido
+
+La opción 8 del menú principal, **Crear índice invertido** (exclusiva del perfil `ADMIN`), lanza el ejecutable `target/util/inverted_index`. Este procesa todos los libros de `BOOKS_DIR` y construye un índice invertido: para cada palabra, en qué libros aparece y cuántas veces.
+
+El código está en:
+
+| Archivo | Contenido |
+|---------|-----------|
+| `src/util/inverted_index.cpp` | `main`: valida las variables de entorno y coordina los pasos |
+| `include/InvertedIndex.h` | Structs `Book` (elemento de la cola) e `IndexState` (estado compartido) |
+| `lib/util/InvertedIndex.cpp` | Cola de trabajo, threads, semáforos y armado del índice |
+| `lib/util/CountSystem.cpp` | `countWordFrequency`: cuenta las apariciones de cada palabra de un libro |
+
+### Funcionamiento: cola → threads → semáforos → resultados → índice invertido
+
+1. **Validación.** Antes de empezar se validan las variables de entorno (`N_THREADS` debe ser un entero entre 1 y 64) y la carpeta de libros: que exista, que sea una carpeta, que se pueda leer y que tenga libros. Si hay un problema se informa y no se inicia el procesamiento.
+2. **Identificación de los libros.** Cada archivo de la carpeta recibe un id numérico único (1..N, en orden alfabético). La asociación `id;nombre` se guarda en `BOOK_MAP_FILE`.
+3. **Cola de trabajo.** El thread principal es el productor: agrega cada libro a una cola compartida (`queue<Book>`).
+4. **Threads trabajadores.** Se crean `N_THREADS` threads (`std::thread`). Cada uno repite: sacar un libro de la cola, leerlo (`readTextFile`), contar sus palabras (`countWordFrequency`) e integrar el resultado al índice global. Un mismo libro nunca lo procesan dos threads, porque sacarlo de la cola es una sección crítica.
+5. **Semáforos** (`<semaphore.h>`). Protegen los recursos compartidos:
+
+    | Semáforo | Tipo | Sección crítica que controla |
+    |----------|------|------------------------------|
+    | `availableBooks` | Contador, parte en 0 | Cuántos elementos hay en la cola. Un thread sin trabajo se bloquea en `sem_wait` hasta que el productor agrega algo (`sem_post`) |
+    | `queueMutex` | Binario, parte en 1 | Agregar y sacar elementos de la cola |
+    | `indexMutex` | Binario, parte en 1 | Integrar un resultado al índice global y actualizar los contadores de libros |
+    | `outputMutex` | Binario, parte en 1 | Escribir mensajes en pantalla sin que se mezclen |
+
+6. **Resultados parciales.** Leer y contar un libro se hace **fuera** de las secciones críticas, sobre un `map` propio de cada thread; esa es la parte que corre en paralelo. Solo la integración al índice global ocurre dentro de la sección crítica.
+7. **Fin del procesamiento.** Después de los libros, el thread principal agrega una marca de fin por cada thread. Como la cola es FIFO, las marcas salen después de todos los libros: cada thread que recibe una termina. El thread principal espera a todos con `join()`; recién ahí la cola está vacía, todos los libros fueron procesados y el índice está completo. Entonces se ordena y se escribe en `INVERTED_INDEX_FILE`.
+
+### Conteo de palabras
+
+Se usan las mismas reglas que el conteo de las opciones 6 y 7 (CountSystem): una palabra es una secuencia de letras (incluye tildes, ü y ñ) y dígitos; cualquier otro carácter la separa. Las palabras se guardan en minúsculas, así "Corazón" y "corazón" son la misma palabra.
+
+### Archivos generados
+
+`BOOK_MAP_FILE`, una línea por libro:
+
+```
+1;ARoomWithAView.txt
+2;AStudyInScarlet.txt
+```
+
+`INVERTED_INDEX_FILE`, una línea por palabra en orden alfabético. Cada par es `(id del libro, cantidad de apariciones)`:
+
+```
+corazón;(8,141);(15,70);(16,171);(19,92)
+```
+
+### Ejecutar
+
+Desde el menú principal con un usuario `ADMIN`: opción 8 y luego 1. También se puede ejecutar directamente desde la carpeta SistOpe:
+
+```bash
+./target/util/inverted_index
+```
+
+La cantidad de threads se define en `.env` con `N_THREADS`. Para probar otro valor sin editar el archivo, se puede definir al ejecutar, porque las variables que ya existen en el entorno tienen prioridad sobre el `.env`:
+
+```bash
+N_THREADS=8 ./target/util/inverted_index
+```
+
 ## LIBROS
 Todos los libros que se utilizan fueron obtenidos a traves de https://www.gutenberg.org/
 50 Mb de libros en formato .txt fueron guardados en la carpeta LIBROS dentro de db.

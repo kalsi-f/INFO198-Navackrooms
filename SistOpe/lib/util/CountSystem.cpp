@@ -52,6 +52,23 @@ size_t utf8CharacterLength(unsigned char c) {
     return 1;
 }
 
+// agrega la letra en minuscula a la palabra
+// en UTF-8 las mayusculas con tilde, Ü y Ñ estan 0x20 antes que su minuscula
+void appendLowercase(string& word, const string& text, size_t index, size_t bytes) {
+    unsigned char c = static_cast<unsigned char>(text[index]);
+
+    if (bytes == 1) {
+        if (c >= 'A' && c <= 'Z') c = c - 'A' + 'a';
+        word += static_cast<char>(c);
+        return;
+    }
+
+    unsigned char c2 = static_cast<unsigned char>(text[index + 1]);
+    if (c2 >= 0x80 && c2 <= 0x9E) c2 += 0x20;
+    word += static_cast<char>(c);
+    word += static_cast<char>(c2);
+}
+
 void clearScreen() {
     cout << "\033[2J\033[H";
 }
@@ -120,6 +137,51 @@ CountResult countText(const string& text) {
     }
 
     return result;
+}
+
+map<string, int> countWordFrequency(const string& text) {
+    map<string, int> frequency;
+    string word;
+
+    size_t i = 0;
+
+    while (i < text.size()) {
+        unsigned char c = static_cast<unsigned char>(text[i]);
+        size_t bytes = 1;
+        int letterType = getLetterType(text, i, bytes);
+
+        // letras y digitos forman parte de la palabra, igual que en countText
+        if (letterType == 1 || letterType == 2) {
+            appendLowercase(word, text, i, bytes);
+            i += bytes;
+            continue;
+        }
+
+        if (isDigit(static_cast<char>(c))) {
+            word += static_cast<char>(c);
+            i++;
+            continue;
+        }
+
+        // espacios y caracteres especiales cierran la palabra
+        if (!word.empty()) {
+            frequency[word]++;
+            word.clear();
+        }
+
+        if (c == ' ' || c == '\n' || c == '\t' || c == '\r') {
+            i++;
+        } else {
+            i += utf8CharacterLength(c);
+        }
+    }
+
+    // ultima palabra si el texto no termina en separador
+    if (!word.empty()) {
+        frequency[word]++;
+    }
+
+    return frequency;
 }
 
 string readTextFile(const string& path) {

@@ -1,6 +1,7 @@
 #ifndef COUNT_SYSTEM_H
 #define COUNT_SYSTEM_H
 
+#include <map>
 #include <string>
 
 using namespace std;
@@ -13,6 +14,10 @@ struct CountResult {
 };
 
 CountResult countText(const string& text);
+
+// cuenta cuantas veces aparece cada palabra (palabra -> cantidad), usa las
+// mismas reglas de countText y deja las palabras en minusculas
+map<string, int> countWordFrequency(const string& text);
 
 
 string readTextFile(const string& path);

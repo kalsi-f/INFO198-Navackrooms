@@ -165,6 +165,7 @@ void main_menu(vector<Profile>& profiles, Users& users, int userId, const string
         {"Calcular f(x) = x^2 + 2x + 8", getEnvVar("FX_PROGRAM"), {}},
         {"Conteo sobre texto", getEnvVar("COUNT_PROGRAM"), {filePath}},
         {"Conteo sobre archivo", getEnvVar("COUNT_PROGRAM"), {}},
+        {"Crear índice invertido", getEnvVar("INVERTED_INDEX_PROGRAM"), {}},
     };
 
     program_menu(
