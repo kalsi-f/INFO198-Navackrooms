@@ -14,6 +14,7 @@
 #include <iostream>
 #include <semaphore.h>
 #include <thread>
+#include <unistd.h>
 
 using namespace std;
 
@@ -80,5 +81,12 @@ int main() {
     cout << "Indice creado: " << config.indexFile << " (" << index.wordCount() << " palabras)" << endl;
     cout << "Mapeo de libros: " << config.bookMapFile << endl;
     cout << "Tiempo de procesamiento: " << seconds << " s con " << nThreads << " hilos" << endl;
+
+    // El menu limpia la pantalla al volver: esperamos para que se alcance a leer el resumen.
+    // Solo si hay una persona en la terminal, para no trabar ejecuciones desde scripts.
+    if (isatty(STDIN_FILENO)) {
+        cout << "Presione ENTER para continuar...";
+        cin.get();
+    }
     return 0;
 }

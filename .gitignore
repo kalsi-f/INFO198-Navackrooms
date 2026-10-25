@@ -1,2 +1,6 @@
 # binario generado por make
 SistOpe/sistope
+
+# generados por target/util/indexer
+SistOpe/db/indice_invertido.idx
+SistOpe/db/libros.map
