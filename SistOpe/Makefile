@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -std=c++17 -Iinclude
+CXXFLAGS = -Wall -std=c++17 -Iinclude -pthread
 
 LIB = $(shell find lib -name '*.cpp')
 HEADERS = $(shell find include -name '*.h')
@@ -12,6 +12,7 @@ GAME_CLIENT_SRC = src/util/game_client.cpp
 PALINDROME_SRC = src/util/palindrome.cpp
 FX_SRC = src/util/fx.cpp
 COUNT_SRC = src/util/count.cpp
+INDEXER_SRC = src/util/indexer.cpp
 
 TARGET = target/sistope
 ADMIN_TARGET = target/util/admin
@@ -22,6 +23,7 @@ GAME_CLIENT_TARGET = target/util/game_client
 PALINDROME_TARGET = target/util/palindrome
 FX_TARGET = target/util/fx
 COUNT_TARGET = target/util/count
+INDEXER_TARGET = target/util/indexer
 
 
 all: compile
@@ -29,7 +31,7 @@ all: compile
 mkdir:
 	mkdir -p target/util 
 
-compile: $(TARGET) $(ADMIN_TARGET) $(MATRIX_MULTIPLICATION_TARGET) $(GAME_TARGET) $(GAME_SERVER_TARGET) $(GAME_CLIENT_TARGET) $(PALINDROME_TARGET) $(FX_TARGET) $(COUNT_TARGET)
+compile: $(TARGET) $(ADMIN_TARGET) $(MATRIX_MULTIPLICATION_TARGET) $(GAME_TARGET) $(GAME_SERVER_TARGET) $(GAME_CLIENT_TARGET) $(PALINDROME_TARGET) $(FX_TARGET) $(COUNT_TARGET) $(INDEXER_TARGET)
 
 $(TARGET): $(MAIN_SRC) $(LIB) $(HEADERS) | mkdir
 	$(CXX) $(CXXFLAGS) $(MAIN_SRC) $(LIB) -o $(TARGET)
@@ -58,10 +60,13 @@ $(FX_TARGET): $(FX_SRC) $(LIB) $(HEADERS) | mkdir
 $(COUNT_TARGET): $(COUNT_SRC) $(LIB) $(HEADERS) | mkdir
 	$(CXX) $(CXXFLAGS) $(COUNT_SRC) $(LIB) -o $(COUNT_TARGET)
 
+$(INDEXER_TARGET): $(INDEXER_SRC) $(LIB) $(HEADERS) | mkdir
+	$(CXX) $(CXXFLAGS) $(INDEXER_SRC) $(LIB) -o $(INDEXER_TARGET)
+
 run: all
 	./$(TARGET)
 
 clean:
-	rm -f $(TARGET) $(ADMIN_TARGET) $(MATRIX_MULTIPLICATION_TARGET) $(GAME_TARGET) $(GAME_SERVER_TARGET) $(GAME_CLIENT_TARGET) $(PALINDROME_TARGET) $(FX_TARGET) $(COUNT_TARGET)
+	rm -f $(TARGET) $(ADMIN_TARGET) $(MATRIX_MULTIPLICATION_TARGET) $(GAME_TARGET) $(GAME_SERVER_TARGET) $(GAME_CLIENT_TARGET) $(PALINDROME_TARGET) $(FX_TARGET) $(COUNT_TARGET) $(INDEXER_TARGET)
 
 .PHONY: all run clean mkdir compile
