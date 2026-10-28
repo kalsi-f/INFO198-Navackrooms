@@ -158,12 +158,12 @@ El código está en:
     | `indexMutex` | Binario, parte en 1 | Integrar un resultado al índice global y actualizar los contadores de libros |
     | `outputMutex` | Binario, parte en 1 | Escribir mensajes en pantalla sin que se mezclen |
 
-6. **Resultados parciales.** Leer y contar un libro se hace **fuera** de las secciones críticas, sobre un `map` propio de cada thread; esa es la parte que corre en paralelo. Solo la integración al índice global ocurre dentro de la sección crítica.
+6. **Resultados parciales.** Leer y contar un libro se hace **fuera** de las secciones críticas, sobre un `unordered_map` propio de cada thread; esa es la parte que corre en paralelo. Solo la integración al índice global ocurre dentro de la sección crítica.
 7. **Fin del procesamiento.** Después de los libros, el thread principal agrega una marca de fin por cada thread. Como la cola es FIFO, las marcas salen después de todos los libros: cada thread que recibe una termina. El thread principal espera a todos con `join()`; recién ahí la cola está vacía, todos los libros fueron procesados y el índice está completo. Entonces se ordena y se escribe en `INVERTED_INDEX_FILE`.
 
 ### Conteo de palabras
 
-Se usan las mismas reglas que el conteo de las opciones 6 y 7 (CountSystem): una palabra es una secuencia de letras (incluye tildes, ü y ñ) y dígitos; cualquier otro carácter la separa. Las palabras se guardan en minúsculas, así "Corazón" y "corazón" son la misma palabra.
+Se usan las mismas reglas que el conteo de las opciones 6 y 7 (CountSystem): una palabra es una secuencia de letras y dígitos; cualquier otro carácter la separa. Se reconocen como letras todas las letras latinas, también las con tilde, diéresis o cedilla (á, è, ö, ñ, ç, æ, ß, etc.). Las palabras se guardan en minúsculas, así "Corazón" y "corazón" son la misma palabra.
 
 ### Archivos generados
 

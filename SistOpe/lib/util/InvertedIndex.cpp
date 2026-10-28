@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <thread>
+#include <unordered_map>
 
 using namespace std;
 
@@ -47,7 +48,7 @@ void worker(IndexState& state, int threadNumber) {
         }
 
         // leer y contar fuera de las secciones criticas, esta parte corre en paralelo
-        map<string, int> frequency;
+        unordered_map<string, int> frequency;
         try {
             frequency = countWordFrequency(readTextFile(book.path));
         } catch (const exception& e) {

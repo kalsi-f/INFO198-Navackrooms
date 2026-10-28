@@ -20,20 +20,24 @@ int getLetterType(const string& text, size_t index, size_t& bytes) {
         return 2; // consonantes
     }
 
-    // vocales con tilde, ü y ñ
+    // letras latinas en UTF-8 (C3 80..C3 BF): tildes, dieresis, ñ, ç, æ, etc.
     if (index + 1 < text.size() && c == 0xC3) {
         unsigned char c2 = static_cast<unsigned char>(text[index + 1]);
         bytes = 2;
 
-        if (c2 == 0xA1 || c2 == 0xA9 || c2 == 0xAD ||
-            c2 == 0xB3 || c2 == 0xBA || c2 == 0xBC ||
-            c2 == 0x81 || c2 == 0x89 || c2 == 0x8D ||
-            c2 == 0x93 || c2 == 0x9A || c2 == 0x9C) {
-            return 1; 
+        // las mayusculas (80..9E) se pasan a minuscula para revisar una sola vez
+        if (c2 >= 0x80 && c2 <= 0x9E) c2 += 0x20;
+
+        // à á â ã ä å æ, è é ê ë, ì í î ï, ò ó ô õ ö, ø ù ú û ü
+        if ((c2 >= 0xA0 && c2 <= 0xA6) || (c2 >= 0xA8 && c2 <= 0xAF) ||
+            (c2 >= 0xB2 && c2 <= 0xB6) || (c2 >= 0xB8 && c2 <= 0xBC)) {
+            return 1;
         }
 
-        if (c2 == 0xB1 || c2 == 0x91) {
-            return 2; 
+        // ç ð ñ ý þ ÿ y ß (0x9F, no tiene mayuscula)
+        if (c2 == 0xA7 || c2 == 0xB0 || c2 == 0xB1 || c2 == 0xBD ||
+            c2 == 0xBE || c2 == 0xBF || c2 == 0x9F) {
+            return 2;
         }
     }
 
@@ -53,7 +57,7 @@ size_t utf8CharacterLength(unsigned char c) {
 }
 
 // agrega la letra en minuscula a la palabra
-// en UTF-8 las mayusculas con tilde, Ü y Ñ estan 0x20 antes que su minuscula
+// en UTF-8 las mayusculas latinas (C3 80..9E) estan 0x20 antes que su minuscula
 void appendLowercase(string& word, const string& text, size_t index, size_t bytes) {
     unsigned char c = static_cast<unsigned char>(text[index]);
 
@@ -139,8 +143,9 @@ CountResult countText(const string& text) {
     return result;
 }
 
-map<string, int> countWordFrequency(const string& text) {
-    map<string, int> frequency;
+// unordered_map porque no necesita orden y es mas rapido que map para contar
+unordered_map<string, int> countWordFrequency(const string& text) {
+    unordered_map<string, int> frequency;
     string word;
 
     size_t i = 0;
