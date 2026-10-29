@@ -130,73 +130,10 @@ BOOK_MAP_FILE=db/libros.map
 N_THREADS=4
 ```
 
-## Índice invertido paralelo
-
-Un índice invertido guarda, para cada palabra, en qué libros aparece y cuántas veces. Se genera desde la opción 8 del menú o ejecutando directamente, desde la carpeta `SistOpe`:
-
-```bash
-./target/util/indexer
-N_THREADS=8 ./target/util/indexer      # sobreescribe una variable del .env
-```
-
-### Archivos generados
-
-`INDEX_FILE`, una palabra por línea, en orden alfabético, con `(id_libro,veces)` por cada libro donde aparece:
-```
-quijote;(8,2241);(20,1)
-señor;(8,1065);(15,44);(16,28);(19,778);(20,527)
-```
-
-`BOOK_MAP_FILE`, la asociación id ↔ libro. Los ids se asignan por orden alfabético del nombre, así que se mantienen entre ejecuciones:
-```
-8;DonQuijote.txt
-20;LosmiserablesTOMO2.txt
-```
-
-### Flujo: cola → threads → semáforos → resultados → índice
-
-1. **Validación.** Se leen y validan `BOOKS_DIR`, `INDEX_FILE`, `BOOK_MAP_FILE` y `N_THREADS` (entero > 0). Se verifica que la carpeta exista y se pueda leer, y se listan los `.txt`. Si algo falla, se informa y no se procesa nada.
-2. **Cola.** Cada libro (`id`, nombre, ruta, tamaño) se agrega a una cola de trabajo compartida, ordenada de mayor a menor tamaño para que los libros grandes no queden para el final.
-3. **Threads.** Se crean `N_THREADS` hilos trabajadores (si hay más hilos que libros, se usan tantos hilos como libros). Cada hilo repite: sacar un libro de la cola → contar sus palabras en un mapa **local** → incorporar ese mapa al índice global. Cuando la cola está vacía, el hilo termina.
-4. **Semáforos.** Hay tres recursos compartidos y cada uno tiene un semáforo binario (`sem_t` inicializado en 1):
-
-   | Sección crítica | Dónde | Qué evita |
-   |---|---|---|
-   | Sacar de la cola (`empty` + `front` + `pop`) | `WorkQueue::tryPop` | que dos hilos tomen el mismo libro y otro quede sin procesar |
-   | Agregar al índice global | `InvertedIndex::merge` | que inserciones simultáneas corrompan el `map` o pierdan palabras |
-   | Escribir en consola | `worker` | que los mensajes de distintos hilos se mezclen |
-
-   El conteo de palabras (la parte pesada) se hace **fuera** de las secciones críticas, sobre un mapa privado de cada hilo. Así los hilos cuentan en paralelo y entran al semáforo del índice una sola vez por libro.
-5. **Resultados.** El `main` espera a todos los hilos con `join()`. Que la cola esté vacía no basta, porque puede haber hilos todavía contando el último libro que sacaron.
-6. **Índice.** Con todos los hilos terminados se escribe `INDEX_FILE` (ya sin concurrencia, por lo que no se necesita semáforo) y se informa la cantidad de palabras y el tiempo.
-
-### Organización del código
-
-| Archivo | Responsabilidad |
-|---|---|
-| `src/util/indexer.cpp` | Orquesta el flujo: configuración, cola, hilos, `join`, escritura |
-| `lib/index/IndexConfig.cpp` | Lee y valida las variables de entorno |
-| `lib/index/BookScanner.cpp` | Valida la carpeta, lista los libros, asigna ids, escribe `BOOK_MAP_FILE` |
-| `lib/index/Tokenizer.cpp` | Cuenta las palabras de un libro |
-| `lib/index/WorkQueue.cpp` | Cola de trabajo protegida con semáforo |
-| `lib/index/InvertedIndex.cpp` | Índice global protegido con semáforo; escribe `INDEX_FILE` |
-| `lib/index/Worker.cpp` | Función que ejecuta cada hilo |
-
-### Qué se considera palabra
-
-Se pasa todo a minúsculas y cualquier carácter que no sea letra o número separa palabras. Las letras con tilde y la `ñ` (2 bytes en UTF-8, primer byte `0xC3`) se tratan como letras, siguiendo el mismo criterio que el módulo de conteo (`CountSystem`). Las comillas tipográficas y guiones largos separan palabras.
-
-Limitaciones conocidas: `don't` se cuenta como `don` y `t`; los números también se cuentan como palabras; el texto de licencia de Project Gutenberg incluido en cada libro también se indexa.
-
-### Verificación
-
-El índice generado es idéntico (byte a byte) con 1, 2, 4, 8 y 100 hilos al de una versión secuencial de referencia. Con los 46 libros, 1 hilo tarda ~2,9 s y 4 hilos ~1 s.
 
 ## LIBROS
 Todos los libros que se utilizan fueron obtenidos a traves de https://www.gutenberg.org/
 50 Mb de libros en formato .txt fueron guardados en la carpeta LIBROS dentro de db.
-
-
 
 ### Comandos del juego
 
